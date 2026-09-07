@@ -31,7 +31,12 @@ export const aisleAxes: AisleAxis[] = [
   ...[2, 6].flatMap((side) =>
     [-20, 0, 20].map((station) => ({ side, station })),
   ),
-  ...[1, 3, 5, 7].map((side) => ({ side, station: Math.PI / 4 })),
+  // Move the two adjacent corner stairs away from the open Sector A seams,
+  // including the width of their pitch-side approach flights.
+  ...[1, 3, 5, 7].map((side) => ({
+    side,
+    station: ((side === 1 ? 65 : side === 7 ? 25 : 45) * Math.PI) / 180,
+  })),
 ]
 
 // Unlike normalized perimeter distance, straight-side stations cannot drift as rows expand.

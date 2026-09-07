@@ -8,8 +8,8 @@ def sample(lat,lon):
  y=(43-lat)*(n-1);x=(lon-23)*(n-1);ix=int(x);iy=int(y);fx=x-ix;fy=y-iy
  def at(i,j):return struct.unpack_from('>h',raw,(j*n+i)*2)[0]
  return (at(ix,iy)*(1-fx)+at(ix+1,iy)*fx)*(1-fy)+(at(ix,iy+1)*(1-fx)+at(ix+1,iy+1)*fx)*fy
-# Include the whole Vitosha massif south of Sofia, with a little plain at its foot.
-cols=181;rows=181;west=23.10;east=23.45;north=42.70;south=42.44
+# Prepend 21 rows of Sofia plain; preserve the original 181-row mountain grid spacing.
+cols=181;rows=202;west=23.10;east=23.45;north=42.70+21*(42.70-42.44)/180;south=42.44
 heights=[round(sample(north+(south-north)*r/(rows-1),west+(east-west)*c/(cols-1))) for r in range(rows) for c in range(cols)]
 origin={'lat':42.684306,'lon':23.339806,'elevation':round(sample(42.684306,23.339806))}
 output={'source':'Mapzen Terrain Tiles / N42E023','sourceUrl':'https://registry.opendata.aws/terrain-tiles/','bounds':{'west':west,'east':east,'north':north,'south':south},'cols':cols,'rows':rows,'origin':origin,'heights':heights}

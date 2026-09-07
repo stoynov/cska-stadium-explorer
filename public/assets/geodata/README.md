@@ -17,3 +17,13 @@ Complete forest relations (outer rings and inner clearings) supplement the bound
 - https://api.openstreetmap.org/api/0.6/relation/13871756/full
 
 Pass those downloaded files after the map response to `scripts/prepare-sofia-context.py`. The resulting extract contains 644 building outlines and 45 woodland polygons. Missing open relation rings cause extraction to fail rather than inventing a closure. Holes remain free of generated trees.
+
+## Wider city revision — 7 September 2026
+
+`sofia-city.json` replaces the legacy narrow building strip in the renderer; woodland still uses `sofia-context.json`. The wider snapshot includes 18,000 selected buildings, 141 courtyard holes and 2,759 major-road ways within a maximum 4.3 km radius. A 520 m inner exclusion preserves the detailed stadium and park. This is a bounded, simplified context model rather than complete municipal coverage.
+
+The dataset records its OpenStreetMap snapshot time, source-response SHA-256, query bounds, omitted-feature counts, coordinate schema and per-building height source. There are 36 explicit height tags, 6,516 heights derived from floor counts and 11,448 type estimates. Coordinates are quantized to 0.1 m in the stadium frame; this storage precision does not imply equivalent survey accuracy. Road widths are estimated and grade-separated junctions are simplified.
+
+Reproduce the extraction using the download and preparation commands at the top of `scripts/prepare-sofia-city.py`, with `scripts/sofia-city.overpassql`. Run `python3 -m unittest discover -s scripts` for parser/height/ring checks. Re-querying a live map service can produce a different snapshot.
+
+The elevation grid now extends north to 42.730333° using the same N42E023 source. Its original mountain samples and spacing are preserved. New roads and buildings sample the actual triangulated terrain surface. Both this adapted city extract and its attribution are served publicly with the site.

@@ -12,6 +12,8 @@ Building and woodland data in `src/scene/data/sofia-context.json` and `public/as
 
 The source data is distributed with this repository. `scripts/prepare-sofia-context.py` documents extraction and transformations.
 
+The wider city extract in `src/scene/data/sofia-city.json` and `public/assets/geodata/sofia-city.json` contains building footprints, courtyard holes and major road centerlines from OpenStreetMap, under the same ODbL terms. `scripts/sofia-city.overpassql` records the source query; `scripts/prepare-sofia-city.py` records filtering, coordinate quantization, height estimation and the coverage budget. The dataset includes snapshot time, bounds and height provenance. Estimated heights do not constitute surveyed building information.
+
 ## Terrain
 
 `src/scene/data/vitosha-dem.json` is resampled from Mapzen Terrain Tiles. Europe terrain data was produced using Copernicus data and information funded by the European Union (EU-DEM layers); SRTM and GMTED2010 data are courtesy of the U.S. Geological Survey.

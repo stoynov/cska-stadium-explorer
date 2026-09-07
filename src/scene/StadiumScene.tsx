@@ -48,7 +48,7 @@ function World({
 }: Props & { api: React.RefObject<SceneHandle | null>; compact: boolean }) {
   const stadium = useMemo(() => buildStadium(), []),
     park = useMemo(() => buildPark(compact), [compact]),
-    landscape = useMemo(() => buildSofiaLandscape(), [])
+    landscape = useMemo(() => buildSofiaLandscape({ compact }), [compact])
   const { gl, scene, camera } = useThree(),
     sun = useRef<THREE.DirectionalLight>(null),
     fill = useRef<THREE.HemisphereLight>(null),

@@ -1,13 +1,14 @@
 export const content = {
   bg: {
     portfolioProject: 'ЛИЧЕН ПРОЕКТ',
-    behindProject: 'За разработката',
+    behindProject: 'Практика в разработката с AI',
     projectSummary:
-      'Процедурна 3D архитектура, плавни движения на камерата и достъпен двуезичен интерфейс. Стадионът се изгражда с код и може да бъде изтеглен като 3D модел.',
+      'Създадох този проект, за да развия уменията си за работа с AI: анализ на фотографии, координиране на специализирани агенти и проверка на техните решения. Процедурният модел се проверява с геометрични тестове, преглед в браузър и повторно зареждане на 3D експорта.',
     developer: 'Разработчик',
     builtWith: 'Технологии',
     visitPortfolio: 'Портфолио',
     viewCode: 'Код в GitHub',
+    viewCaseStudy: 'Как използвах AI',
     tower: {
       eyebrow: 'ТЕЛЕВИЗИОННА КУЛА „СОФИЯ“',
       title: 'Над короните\nна дърветата.',
@@ -106,13 +107,14 @@ export const content = {
   },
   en: {
     portfolioProject: 'INDEPENDENT PROJECT',
-    behindProject: 'Behind the experience',
+    behindProject: 'Learning to build with AI',
     projectSummary:
-      'Procedural 3D architecture, smooth camera transitions, and an accessible bilingual interface. The stadium is built in code and can be exported as a 3D model.',
+      'I built this project to develop my AI-assisted engineering skills: interpreting photographs, coordinating specialist agents, and checking their decisions. The procedural model is verified through geometry tests, browser inspection, and 3D export re-import.',
     developer: 'Developer',
     builtWith: 'Built with',
     visitPortfolio: 'Visit my portfolio',
     viewCode: 'View source',
+    viewCaseStudy: 'How I used AI',
     tower: {
       eyebrow: 'SOFIA TELEVISION TOWER',
       title: 'Above\nthe treetops.',

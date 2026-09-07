@@ -4,59 +4,10 @@ import context from '../data/sofia-context.json'
 import { box, beam, standard, seededRandom } from './geometry'
 import { mergeStatic } from './stadium'
 
-// Long-axis orientation measured from OSM way 1331127486; +X points to the NW entrance.
-const axis = THREE.MathUtils.degToRad(41.31335)
-export function geographicPoint(
-  lat: number,
-  lon: number,
-  elevation = dem.origin.elevation,
-) {
-  const north = (lat - dem.origin.lat) * 111132,
-    east =
-      (lon - dem.origin.lon) *
-      111320 *
-      Math.cos(THREE.MathUtils.degToRad(dem.origin.lat))
-  return new THREE.Vector3(
-    -Math.sin(axis) * east + Math.cos(axis) * north,
-    elevation - dem.origin.elevation,
-    Math.cos(axis) * east + Math.sin(axis) * north,
-  )
-}
-export function landscapeHeight(x: number, z: number) {
-  const east = -Math.sin(axis) * x + Math.cos(axis) * z,
-    north = Math.cos(axis) * x + Math.sin(axis) * z
-  const lat = dem.origin.lat + north / 111132,
-    lon =
-      dem.origin.lon +
-      east / (111320 * Math.cos(THREE.MathUtils.degToRad(dem.origin.lat)))
-  const gx = THREE.MathUtils.clamp(
-    ((lon - dem.bounds.west) / (dem.bounds.east - dem.bounds.west)) *
-      (dem.cols - 1),
-    0,
-    dem.cols - 1.001,
-  )
-  const gy = THREE.MathUtils.clamp(
-    ((dem.bounds.north - lat) / (dem.bounds.north - dem.bounds.south)) *
-      (dem.rows - 1),
-    0,
-    dem.rows - 1.001,
-  )
-  const ix = Math.floor(gx),
-    iy = Math.floor(gy),
-    fx = gx - ix,
-    fy = gy - iy
-  const at = (a: number, b: number) => dem.heights[b * dem.cols + a]
-  const elevation = THREE.MathUtils.lerp(
-    THREE.MathUtils.lerp(at(ix, iy), at(ix + 1, iy), fx),
-    THREE.MathUtils.lerp(at(ix, iy + 1), at(ix + 1, iy + 1), fx),
-    fy,
-  )
-  return THREE.MathUtils.lerp(
-    -0.3,
-    elevation - dem.origin.elevation,
-    THREE.MathUtils.smoothstep(Math.hypot(x, z), 350, 1050),
-  )
-}
+import { geographicPoint, landscapeHeight } from './geographic'
+import { buildSofiaCity } from './sofia-city'
+export { geographicPoint, landscapeHeight } from './geographic'
+
 export const towerLocation = geographicPoint(42.676756, 23.341764, 608.6)
 export function buildVitosha() {
   const positions: number[] = [],
@@ -277,65 +228,6 @@ function insidePolygon(x: number, z: number, points: THREE.Vector3[]) {
   return inside
 }
 function addMappedSurroundings(parent: THREE.Group) {
-  const buildings = new THREE.Group()
-  buildings.name = 'Distant buildings — OpenStreetMap footprints'
-  const wall = standard('#b5b4aa', 0.95),
-    roof = standard('#89928f', 0.95)
-  for (const feature of context.features.filter((f) => f.kind === 'building')) {
-    const points = feature.points.map(([lat, lon]) => geographicPoint(lat, lon))
-    const center = points
-      .reduce((a, p) => a.add(p), new THREE.Vector3())
-      .multiplyScalar(1 / points.length)
-    const shape = new THREE.Shape(
-      points.map((p) => new THREE.Vector2(p.x - center.x, -p.z + center.z)),
-    )
-    const geometry = new THREE.ExtrudeGeometry(shape, {
-      depth: feature.height,
-      bevelEnabled: false,
-      steps: 1,
-    })
-    geometry.rotateX(-Math.PI / 2)
-    const mesh = new THREE.Mesh(geometry, [roof, wall])
-    mesh.position.set(center.x, landscapeHeight(center.x, center.z), center.z)
-    buildings.add(mesh)
-  }
-  // Merge separately by material; normalize the cap/side groups before batching.
-  const batches = [new THREE.Group(), new THREE.Group()]
-  buildings.children.forEach((child) => {
-    const m = child as THREE.Mesh
-    for (const g of m.geometry.groups) {
-      const part = m.geometry.clone()
-      part.clearGroups()
-      part.setDrawRange(g.start, g.count)
-      // Extract only the group's vertices; ExtrudeGeometry is non-indexed.
-      const extracted = new THREE.BufferGeometry()
-      for (const key of ['position', 'normal', 'uv']) {
-        const attr = part.getAttribute(key)
-        extracted.setAttribute(
-          key,
-          new THREE.Float32BufferAttribute(
-            Array.from(attr.array).slice(
-              g.start * attr.itemSize,
-              (g.start + g.count) * attr.itemSize,
-            ),
-            attr.itemSize,
-          ),
-        )
-      }
-      const piece = new THREE.Mesh(
-        extracted,
-        g.materialIndex === 0 ? roof : wall,
-      )
-      piece.position.copy(m.position)
-      batches[g.materialIndex ?? 0].add(piece)
-      part.dispose()
-    }
-    m.geometry.dispose()
-  })
-  for (const batch of batches) {
-    mergeStatic(batch)
-    parent.add(batch)
-  }
   const random = seededRandom(1959),
     trees: { x: number; z: number; h: number; w: number }[] = []
   for (const feature of context.features.filter((f) => f.kind === 'wood')) {
@@ -404,10 +296,11 @@ function addMappedSurroundings(parent: THREE.Group) {
   crown.name = 'Mapped woodland around the television tower'
   parent.add(crown, trunks)
 }
-export function buildSofiaLandscape() {
+export function buildSofiaLandscape(options: { compact?: boolean } = {}) {
   const group = new THREE.Group()
   group.name = 'Sofia geographic context'
   group.add(buildVitosha(), buildTelevisionTower())
   addMappedSurroundings(group)
+  group.add(buildSofiaCity(options))
   return group
 }

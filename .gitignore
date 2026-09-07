@@ -10,6 +10,8 @@ dist/
 .vscode/
 coverage/
 *.log
+__pycache__/
+*.py[cod]
 prompts/
 
 # Local research downloads and regenerable model exports.

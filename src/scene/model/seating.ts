@@ -1,5 +1,7 @@
 import { whiteSeat } from './seat-lettering'
 import { addHospitality } from './hospitality'
+import { addCornerEntries } from './corner-entries'
+import { clipCornerEntry, inCornerEntry } from './corner-entry-layout'
 import { stadiumDimensions } from '../../config/stadium'
 import * as THREE from 'three'
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js'
@@ -39,6 +41,15 @@ export function addSeating(parent: THREE.Group) {
     c: number[],
     d: number[],
   ) => out.push(...a, ...b, ...c, ...a, ...c, ...d)
+  const clippedQuad = (
+    out: number[],
+    side: number,
+    ...vertices: number[][]
+  ) => {
+    const polygon = clipCornerEntry(side, vertices)
+    for (let i = 1; i < polygon.length - 1; i++)
+      out.push(...polygon[0], ...polygon[i], ...polygon[i + 1])
+  }
   const seats: {
     x: number
     y: number
@@ -68,9 +79,17 @@ export function addSeating(parent: THREE.Group) {
           b = bowlPoint(side, s1, depth)
         const c = bowlPoint(side, s1, depth + bowl.rowDepth),
           d = bowlPoint(side, s0, depth + bowl.rowDepth)
-        quad(tops, [a.x, y, a.z], [b.x, y, b.z], [c.x, y, c.z], [d.x, y, d.z])
-        quad(
+        clippedQuad(
+          tops,
+          side,
+          [a.x, y, a.z],
+          [b.x, y, b.z],
+          [c.x, y, c.z],
+          [d.x, y, d.z],
+        )
+        clippedQuad(
           risers,
+          side,
           [d.x, y, d.z],
           [c.x, y, c.z],
           [c.x, y + bowl.rowRise, c.z],
@@ -85,6 +104,8 @@ export function addSeating(parent: THREE.Group) {
           depth + 0.42,
         )
         if (circulationAt(p, depth + 0.42, circulation.seatMargin)) continue
+        if ((side === 1 || side === 7) && inCornerEntry(p.x, p.z, 0.36))
+          continue
         const white = whiteSeat(side, p.z, row)
         const premium = side === 0 && Math.abs(p.z) < 20
         const color = new THREE.Color(
@@ -335,5 +356,6 @@ export function addSeating(parent: THREE.Group) {
   upperCirculation.name = 'Upper circulation — public stands only'
   group.add(upperCirculation)
   addHospitality(group)
+  addCornerEntries(group)
   return group
 }

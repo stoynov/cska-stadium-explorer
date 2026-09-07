@@ -1,6 +1,6 @@
 # CSKA stadium modelling assumptions
 
-Prepared 6 September 2026. This is an interpretation of the intended completed Bulgarian Army Stadium, not a statement that the venue has opened.
+Prepared 6 September 2026; updated 7 September 2026. This is an interpretation of the intended completed Bulgarian Army Stadium, not a statement that the venue has opened.
 
 ## Evidence used
 
@@ -16,7 +16,7 @@ Prepared 6 September 2026. This is an interpretation of the intended completed B
 | --- | --- | --- |
 | Footprint | Rounded rectangle, approximately 146 × 187 m at the outer façade | Visual proportion estimate; no survey drawings |
 | Pitch | 105 × 68 m, long axis along local Z; centre at local origin | Explicit standard-size modelling assumption, not a verified CSKA dimension |
-| Coordinates | Local X across pitch, local Z along pitch, Y up; Sector A hospitality and entrance on +X, lettering on −X | Sector A assigned from entrance-side photographic evidence; no true-north alignment implied |
+| Coordinates | Local X across pitch, local Z along pitch, Y up; Sector A hospitality and entrance on +X, lettering on −X | Geographic context is rotated to the OSM-derived pitch axis; this is not surveyed alignment |
 | Bowl | 31 procedural rows on the general stands; Sector A has a shorter lower tier and a dedicated hospitality block with lounge and skybox terraces; radial aisles and approximate recessed portals, separate stair flights and landings | Counts and profiles selected for visual coherence, not official seating documentation; see the [Sector A research](goals-sector-a-research.md) |
 | Goals | Connected rear, side and top nets with open fronts; grounded frames with clear 7.32 × 2.44 m openings aligned with the painted goal lines | Opening and frame thickness follow IFAB Law 1; net depths, subdivision and supports are visualization assumptions |
 | Seats | Instanced cushions/backs, primarily red, white mosaic ЦСКА on far long stand | Letter placement supported by aerial; exact typography, glyph proportions approximated; unsupported scattered white seats and end stripes removed in the staircase correction |
@@ -28,6 +28,8 @@ Prepared 6 September 2026. This is an interpretation of the intended completed B
 | Signage | Official local crest and generated Bulgarian stadium-name texture | Small presentation placement interpreted, not signage construction drawings |
 | Lighting | Warm daylight; reduced ambient illumination, central pitch fill and emissive fixtures for evening | Artistic lighting, not a photometric simulation |
 | Park | Deterministically scattered trees, paths, promenade, plaza, benches and scale figures | Illustrative Borisova Gradina setting; paths and vegetation are not mapped or surveyed |
+| Main-stand corner entries | Two open passages below connecting galleries at the ends of Sector A; terrace exits and an interpreted return stair connect to the upper concourse | Supported by the user's clearer main-stand photograph; 7 m widths, elevations and stair routes are estimates, not construction documentation |
+| Sofia context | OSM building footprints, major roads and woodland around the stadium; 18,000 buildings on desktop, 10,000 in the compact profile | Bounded selection within 4.3 km; most heights are derived from levels or estimated by building type. Simplified roofs and road widths; see [city validation](corner-city-validation.md) |
 
 ## Differences between evidence sources
 
@@ -52,4 +54,8 @@ See [detailed photo analysis](staircase-photo-analysis.md). Straight stair axes 
 
 ## Landscape refinement — 2026-09-06
 
-The park now follows the visible entrance approach and curved lawn/path topology in the official completed render and August aerial photographs. See [park photo analysis](park-photo-analysis.md). Route dimensions and planting coordinates remain approximate. The +X entrance direction is a local modelling convention, not a geographic bearing. Procedural trees exclude circulation surfaces; polygon depth offsets keep close ground layers distinct from aerial viewpoints.
+The park now follows the visible entrance approach and curved lawn/path topology in the official completed render and August aerial photographs. See [park photo analysis](park-photo-analysis.md). Route dimensions and planting coordinates remain approximate. The +X entrance direction is a local modelling convention; the geographic context uses a separate OSM-derived transform. Procedural trees exclude circulation surfaces; polygon depth offsets keep close ground layers distinct from aerial viewpoints.
+
+## Corner entries and city revision — 2026-09-07
+
+See [research, implementation and validation](corner-city-validation.md). The adjacent bowl concrete and exterior glazing now have actual openings at both Sector A corners. The city uses an offline OSM extract, shared geographic coordinates and triangle-based terrain sampling. The local landscaped park remains an architectural interpretation; the wider footprints, road centrelines and woodland outlines are mapped context.

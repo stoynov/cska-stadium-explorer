@@ -478,6 +478,10 @@ export default function App() {
               </div>
             </dl>
             <div className="project-actions">
+              <a href={project.caseStudy} target="_blank" rel="noreferrer">
+                {t.viewCaseStudy}
+                <ArrowUpRight size={16} />
+              </a>
               <a href={project.portfolio} target="_blank" rel="noreferrer">
                 {t.visitPortfolio}
                 <ArrowUpRight size={16} />
@@ -513,7 +517,8 @@ export default function App() {
             Terrain: Mapzen. Europe terrain data produced using Copernicus data
             and information funded by the European Union — EU-DEM layers. SRTM
             and GMTED2010 data courtesy of the U.S. Geological Survey. Building
-            and woodland outlines: © OpenStreetMap contributors, ODbL.
+            footprints, roads and woodland outlines: © OpenStreetMap
+            contributors, ODbL.
           </p>
         </Dialog>
       )}

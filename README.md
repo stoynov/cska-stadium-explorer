@@ -2,6 +2,8 @@
 
 An interactive architectural interpretation of CSKA Sofia’s Bulgarian Army Stadium, built with **React, TypeScript, and Three.js**. Explore the stadium, move through five camera chapters, and export the procedural model straight from the browser.
 
+I created this project to practise **AI-assisted software engineering**: interpreting visual references, directing specialist agents, reviewing their output, and turning mistakes into repeatable checks. Read the [AI engineering case study](docs/ai-engineering-case-study.md) for the methods, concrete failures, corrections, and evidence.
+
 **[Live demo](https://cska-stadium-explorer.vercel.app)** · **[Portfolio · Stanislav Stoynov](https://stoynov.dev)** · **[Source](https://github.com/stoynov/cska-stadium-explorer)**
 
 ![CSKA Stadium Explorer: procedural stadium and the landscape of Sofia](public/social-preview.jpg)
@@ -17,7 +19,7 @@ Use **Capture** to save your current view as a PNG, **Download 3D model** to exp
 - **Procedural geometry.** The stadium is constructed in TypeScript: individual façade louvers, roof trusses, seating terraces, stairways, seat lettering, pitch, and park paths. It does not load a prebuilt stadium model.
 - **Rendering efficiency.** Repeated seats, trees, and visitors use instancing. Static surfaces are merged by material. Touch and narrow devices receive lower tree density, shadow resolution, and pixel-ratio limits.
 - **Camera choreography.** Five aspect-aware presets share a single camera controller. User input interrupts transitions; tours stop when the tab is hidden, a dialog opens, or reduced motion is enabled.
-- **Geographic context.** Vitosha uses a sampled elevation grid. Nearby building and woodland outlines come from OpenStreetMap, with an interpreted model of Sofia’s television tower.
+- **Geographic context.** Vitosha uses a sampled elevation grid. A bounded Sofia city model adds 18,000 mapped building footprints, courtyard holes and major roads, with terrain placement and a reduced mobile profile. Building heights retain their tagged, levels-derived or estimated provenance. Sofia’s television tower is interpreted separately.
 - **Client-side exports.** PNG captures omit the interface. GLB export restores the complete roof, includes the stadium only, and validates the result through a Three.js re-import before download. Export modules load on demand.
 - **Resilient interface.** Keyboard-accessible native dialogs, bilingual content, reduced-motion support, and an image fallback when WebGL is unavailable. Fonts and runtime assets are hosted locally.
 
@@ -36,9 +38,10 @@ Open the URL printed by Vite (normally `http://127.0.0.1:5173`). No environment 
 bun run check      # Formatting, regression tests, TypeScript, production build
 bun run preview    # Serve the production build locally
 bun run format     # Format application code and project configuration
+python3 -m unittest discover -s scripts  # Offline map-extractor checks (Python 3)
 ```
 
-The regression suite covers viewer transitions, geometry, staircase clearance, façade layout, seat lettering, park connectivity, visitor placement, and geographic transforms. GitHub Actions runs the same checks on pushes to `main` and pull requests.
+The regression suites cover viewer transitions, geometry, staircase and corner-entrance clearance, hospitality, façade layout, seat lettering, park connectivity, visitor placement, geographic transforms and city extraction. GitHub Actions runs both Bun and Python checks on pushes to `main` and pull requests.
 
 ## Architecture
 
@@ -59,6 +62,8 @@ The regression suite covers viewer transitions, geometry, staircase clearance, f
 ## Deployment and releases
 
 The live site is deployed in the **stoynov-proj** Vercel workspace, connected to this repository. Push to `main` to publish a production update; pull requests receive checks and Vercel previews.
+
+Vercel Web Analytics is mounted once at the React entry point using `@vercel/analytics/react`, with explicit Vite development/production modes. Enable Web Analytics in the project's Vercel dashboard and deploy after enabling it, as described in the [Vercel setup guide](https://vercel.com/docs/analytics/quickstart). Local development uses the SDK's debug mode.
 
 1. **CI** (`.github/workflows/ci.yml`) installs the frozen Bun lockfile, checks formatting, runs regression tests, validates TypeScript, and builds the site. Production builds are archived as workflow artifacts for 14 days.
 2. **Vercel** automatically builds the same commit through its Git integration. `vercel.json` runs `bun run test && bun run build` before publishing `dist/`, so failed tests, TypeScript checks, or builds prevent deployment. Formatting is checked in GitHub CI against the committed files, because Vercel rewrites its build configuration. GitHub CI and Vercel validate independently.

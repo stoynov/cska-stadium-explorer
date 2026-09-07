@@ -1,6 +1,11 @@
 import { assets } from '../../config/assets'
 import { stadiumDimensions } from '../../config/stadium'
 import * as THREE from 'three'
+import {
+  cornerEntries,
+  inCornerEntry,
+  outsideCornerEntrySpans,
+} from './corner-entry-layout'
 import { ringMesh, perimeterPoint, standard, box } from './geometry'
 import {
   facadeBase,
@@ -110,31 +115,70 @@ export function addFacade(parent: THREE.Group) {
   for (let col = 0; col < 40; col++) {
     const z = -62 + (col + 0.5) * 3.1
     for (let row = 0; row < 9; row++) {
-      const pane = box(
-        facade,
-        [0.12, 2.35, 3.04],
-        [71.95, 1.25 + row * 2.4, z],
-        glassTints[(col * 7 + row * 2) % 3],
-        'Blue-grey entrance glazing',
-      )
-      pane.castShadow = false
+      const bottom = 1.25 + row * 2.4 - 2.35 / 2
+      const top = bottom + 2.35
+      const spans =
+        bottom < cornerEntries.exteriorClearHeight
+          ? outsideCornerEntrySpans(z - 1.52, z + 1.52)
+          : [{ start: z - 1.52, end: z + 1.52 }]
+      for (const span of spans) {
+        const pane = box(
+          facade,
+          [0.12, 2.35, span.end - span.start],
+          [71.95, (bottom + top) / 2, (span.start + span.end) / 2],
+          glassTints[(col * 7 + row * 2) % 3],
+          'Blue-grey entrance glazing',
+        )
+        pane.castShadow = false
+      }
     }
+    const mullionBottom = inCornerEntry(72.05, z - 1.55, 0.033)
+      ? cornerEntries.exteriorClearHeight
+      : 0.1
     box(
       facade,
-      [0.2, 21.6, 0.065],
-      [72.05, 10.9, z - 1.55],
+      [0.2, 21.7 - mullionBottom, 0.065],
+      [72.05, (21.7 + mullionBottom) / 2, z - 1.55],
       mullion,
       'Curtain wall mullion',
     )
   }
-  for (let row = 0; row <= 9; row++)
+  for (let row = 0; row <= 9; row++) {
+    const y = 0.05 + row * 2.4
+    const spans =
+      y < cornerEntries.exteriorClearHeight
+        ? outsideCornerEntrySpans(-62, 62)
+        : [{ start: -62, end: 62 }]
+    for (const span of spans)
+      box(
+        facade,
+        [0.2, 0.065, span.end - span.start],
+        [72.05, y, (span.start + span.end) / 2],
+        mullion,
+        'Curtain wall transom',
+      )
+  }
+  for (const sign of [-1, 1]) {
+    for (const z of [cornerEntries.innerZ - 0.12, cornerEntries.outerZ + 0.12])
+      box(
+        facade,
+        [0.32, cornerEntries.exteriorClearHeight, 0.24],
+        [72.05, cornerEntries.exteriorClearHeight / 2, sign * z],
+        structure,
+        'Service opening jamb',
+      )
     box(
       facade,
-      [0.2, 0.065, 124],
-      [72.05, 0.05 + row * 2.4, 0],
-      mullion,
-      'Curtain wall transom',
+      [0.4, 0.25, cornerEntries.outerZ - cornerEntries.innerZ + 0.48],
+      [
+        72.05,
+        cornerEntries.exteriorClearHeight + 0.125,
+        (sign * (cornerEntries.innerZ + cornerEntries.outerZ)) / 2,
+      ],
+      structure,
+      'Service opening lintel',
     )
+  }
   for (const z of [-37.2, -12.4, 12.4, 37.2]) {
     for (const offset of [-0.7, 0.7]) {
       box(

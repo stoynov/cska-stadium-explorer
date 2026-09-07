@@ -122,12 +122,14 @@ export function addHospitality(parent: THREE.Group) {
         )
     }
     for (const sign of [-1, 1]) {
-      // Solid returns close the cut between the lower west profile and full-height corners.
+      // Silver's open terrace continues onto the corner gallery. Only the
+      // recessed room keeps an end wall; the walking strip must remain open.
+      const returnFront = level.name === 'Silver' ? h.glassX : h.frontX
       box(
         group,
-        [h.backX - h.frontX, level.ceiling - level.floor, 0.18],
+        [h.backX - returnFront, level.ceiling - level.floor, 0.18],
         [
-          (h.frontX + h.backX) / 2,
+          (returnFront + h.backX) / 2,
           (level.floor + level.ceiling) / 2,
           sign * (h.halfLength - 0.09),
         ],
