@@ -10,6 +10,7 @@ dist/
 .vscode/
 coverage/
 *.log
+prompts/
 
 # Local research downloads and regenerable model exports.
 docs/reference-evidence/

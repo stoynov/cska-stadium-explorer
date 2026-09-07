@@ -2,7 +2,7 @@
 
 An interactive architectural interpretation of CSKA Sofia’s Bulgarian Army Stadium, built with **React, TypeScript, and Three.js**. Explore the stadium, move through five camera chapters, and export the procedural model straight from the browser.
 
-**[Portfolio · Stanislav Stoynov](https://stoynov.dev)** · **[Source](https://github.com/stoynov/cska-stadium-explorer)**
+**[Live demo](https://cska-stadium-explorer.vercel.app)** · **[Portfolio · Stanislav Stoynov](https://stoynov.dev)** · **[Source](https://github.com/stoynov/cska-stadium-explorer)**
 
 ![CSKA Stadium Explorer: procedural stadium and the landscape of Sofia](public/social-preview.jpg)
 
@@ -66,7 +66,7 @@ The configuration follows [Vercel’s Vite deployment documentation](https://ver
 
 This is an **independent portfolio project**, not an official CSKA website or surveyed architectural model. Stadium geometry, planting, and missing building heights are approximations. The procedural seat count does not establish official capacity. The visitor guide records its source-verification date and does not provide live opening, ticketing, or attendance information.
 
-The project was developed with AI assistance. The [reference audit](docs/reference-audit.md), [reconstruction specification](docs/reference-reconstruction-spec.md), and [development prompts](prompts/) document the process. The experience at [gpt-6-stadium.vercel.app](https://gpt-6-stadium.vercel.app/) informed interaction and composition; its downloaded model is excluded from this repository and is not used at runtime.
+The project was developed with AI assistance. The [reference audit](docs/reference-audit.md) and [reconstruction specification](docs/reference-reconstruction-spec.md) document the process. The experience at [gpt-6-stadium.vercel.app](https://gpt-6-stadium.vercel.app/) informed interaction and composition; its downloaded model is excluded from this repository and is not used at runtime.
 
 The 3D scene is GPU intensive, so performance varies by device. GLB consumers need support for `EXT_mesh_gpu_instancing`. There is no server rendering or offline service worker.
 
