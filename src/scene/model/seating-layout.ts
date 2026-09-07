@@ -1,6 +1,11 @@
 import { stadiumDimensions } from '../../config/stadium'
 
 const bowl = stadiumDimensions.seating
+// Sector A is the entrance (+X) stand. Its upper profile is occupied by lounges.
+export const sectorALowerRows = 16
+export function seatingRows(side: number) {
+  return side === 0 ? sectorALowerRows : bowl.rows
+}
 export const circulation = {
   stairWidth: 1.55,
   portalWidth: 3.0,
@@ -82,12 +87,12 @@ export function circulationAt(point: BowlPoint, depth: number, margin = 0) {
 export function rowSurfaceHeight(row: number) {
   return bowl.baseHeight + row * bowl.rowRise
 }
-export function stairTreads() {
+export function stairTreads(rows = bowl.rows) {
   const result: { depth: number; height: number; rise: number; run: number }[] =
     []
   const run = bowl.rowDepth / circulation.subdivisions,
     rise = bowl.rowRise / circulation.subdivisions
-  for (let i = 0; i < bowl.rows * circulation.subdivisions; i++) {
+  for (let i = 0; i < rows * circulation.subdivisions; i++) {
     const depth = i * run
     if (
       depth >= circulation.portalStart - 1e-5 &&

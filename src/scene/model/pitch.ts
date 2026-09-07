@@ -1,6 +1,7 @@
 import { stadiumDimensions } from '../../config/stadium'
 import * as THREE from 'three'
 import { beam, box, standard, seededRandom } from './geometry'
+import { addGoal, goalPostRadius } from './goals'
 
 export function addPitch(parent: THREE.Group) {
   const pitch = new THREE.Group()
@@ -27,8 +28,14 @@ export function addPitch(parent: THREE.Group) {
   c.save()
   c.scale(w / dimensions.width, h / dimensions.length)
   c.strokeStyle = '#e2e6ce'
-  c.lineWidth = 0.13
-  c.strokeRect(0.16, 0.16, 67.68, 104.68)
+  c.lineWidth = goalPostRadius * 2
+  // Keep the full boundary stroke on the turf and align posts to its centre.
+  c.strokeRect(
+    goalPostRadius,
+    goalPostRadius,
+    dimensions.width - goalPostRadius * 2,
+    dimensions.length - goalPostRadius * 2,
+  )
   c.beginPath()
   c.moveTo(0, 52.5)
   c.lineTo(68, 52.5)
@@ -70,49 +77,43 @@ export function addPitch(parent: THREE.Group) {
   mesh.receiveShadow = true
   mesh.name = 'Grass and pitch markings'
   pitch.add(mesh)
+  // A level, unmarked turf apron closes the gap to the surrounding track and
+  // carries the whole goal footprint. The hole preserves the 105 × 68 field
+  // without overlapping the marked plane or repeating its texture.
+  const halfWidth = dimensions.width / 2
+  const halfLength = dimensions.length / 2
+  const apronShape = new THREE.Shape()
+  apronShape.moveTo(-halfWidth - 1, -halfLength - 3)
+  apronShape.lineTo(halfWidth + 1, -halfLength - 3)
+  apronShape.lineTo(halfWidth + 1, halfLength + 3)
+  apronShape.lineTo(-halfWidth - 1, halfLength + 3)
+  apronShape.closePath()
+  const fieldHole = new THREE.Path()
+  fieldHole.moveTo(-halfWidth, -halfLength)
+  fieldHole.lineTo(-halfWidth, halfLength)
+  fieldHole.lineTo(halfWidth, halfLength)
+  fieldHole.lineTo(halfWidth, -halfLength)
+  fieldHole.closePath()
+  apronShape.holes.push(fieldHole)
+  const apron = new THREE.Mesh(
+    new THREE.ShapeGeometry(apronShape),
+    standard('#50753c'),
+  )
+  apron.name = 'Unmarked turf apron'
+  apron.rotation.x = mesh.rotation.x
+  apron.position.y = mesh.position.y
+  apron.receiveShadow = true
+  pitch.add(apron)
   const white = standard('#eff0e7'),
     steel = standard('#485051')
   for (const end of [-1, 1]) {
-    const z = end * 52.6
-    beam(
+    addGoal(
       pitch,
-      new THREE.Vector3(-3.66, 0.3, z),
-      new THREE.Vector3(-3.66, 2.74, z),
-      0.075,
+      end,
+      dimensions.length / 2 - goalPostRadius,
+      mesh.position.y,
       white,
     )
-    beam(
-      pitch,
-      new THREE.Vector3(3.66, 0.3, z),
-      new THREE.Vector3(3.66, 2.74, z),
-      0.075,
-      white,
-    )
-    beam(
-      pitch,
-      new THREE.Vector3(-3.66, 2.74, z),
-      new THREE.Vector3(3.66, 2.74, z),
-      0.075,
-      white,
-    )
-    const points: number[] = []
-    for (let x = -3.66; x <= 3.67; x += 0.26)
-      points.push(x, 0.3, z + end * 2, x, 2.74, z + end * 1.6)
-    for (let y = 0.3; y <= 2.75; y += 0.22)
-      points.push(-3.66, y, z + end * 1.8, 3.66, y, z + end * 1.8)
-    const nets = new THREE.LineSegments(
-      new THREE.BufferGeometry().setAttribute(
-        'position',
-        new THREE.Float32BufferAttribute(points, 3),
-      ),
-      new THREE.LineBasicMaterial({
-        color: '#bec7b4',
-        transparent: true,
-        opacity: 0.5,
-      }),
-    )
-    nets.name = 'Goal net'
-    pitch.add(nets)
     for (const x of [-36, 36]) {
       beam(
         pitch,

@@ -1,8 +1,9 @@
 import { whiteSeat } from './seat-lettering'
+import { addHospitality } from './hospitality'
 import { stadiumDimensions } from '../../config/stadium'
 import * as THREE from 'three'
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js'
-import { ringMesh, standard, seededRandom, box, beam } from './geometry'
+import { standard, seededRandom, box, beam } from './geometry'
 import {
   aisleAxes,
   bowlPoint,
@@ -12,11 +13,12 @@ import {
   circulation,
   rowSurfaceHeight,
   stairTreads,
+  seatingRows,
 } from './seating-layout'
 
 export function addSeating(parent: THREE.Group) {
   const group = new THREE.Group()
-  group.name = 'Seating bowl — continuous tier with real stair flights'
+  group.name = 'Seating bowl — Sector A hospitality and stepped public stands'
   parent.add(group)
   const concrete = standard('#b8b5ae', 0.93),
     riser = standard('#96938d', 0.96)
@@ -43,12 +45,14 @@ export function addSeating(parent: THREE.Group) {
     z: number
     rotation: number
     color: THREE.Color
+    premium: boolean
   }[] = []
 
   for (let row = 0; row < bowl.rows; row++) {
     const depth = row * bowl.rowDepth,
       y = rowSurfaceHeight(row)
     for (let side = 0; side < 8; side++) {
+      if (row >= seatingRows(side)) continue
       const length =
         side % 2
           ? sideExtent(side, depth) * (bowl.cornerRadius + depth)
@@ -73,7 +77,7 @@ export function addSeating(parent: THREE.Group) {
           [d.x, y + bowl.rowRise, d.z],
         )
       }
-      const count = Math.floor(length / 0.53)
+      const count = Math.floor(length / (side === 0 ? 0.62 : 0.53))
       for (let c = 0; c < count; c++) {
         const p = bowlPoint(
           side,
@@ -82,7 +86,10 @@ export function addSeating(parent: THREE.Group) {
         )
         if (circulationAt(p, depth + 0.42, circulation.seatMargin)) continue
         const white = whiteSeat(side, p.z, row)
-        const color = new THREE.Color(white ? '#ecebe5' : '#bc172c')
+        const premium = side === 0 && Math.abs(p.z) < 20
+        const color = new THREE.Color(
+          white ? '#ecebe5' : premium ? '#8b1b2a' : '#bc172c',
+        )
         color.multiplyScalar(0.9 + rng() * 0.14)
         seats.push({
           x: p.x,
@@ -90,6 +97,7 @@ export function addSeating(parent: THREE.Group) {
           z: p.z,
           rotation: Math.atan2(-p.nx, -p.nz),
           color,
+          premium,
         })
       }
     }
@@ -137,6 +145,7 @@ export function addSeating(parent: THREE.Group) {
   brackets.name = 'Dark seat brackets'
   const dummy = new THREE.Object3D()
   seats.forEach((seat, i) => {
+    dummy.scale.set(seat.premium ? 1.12 : 1, seat.premium ? 1.1 : 1, 1)
     dummy.rotation.set(0, seat.rotation, 0)
     dummy.position.set(seat.x, seat.y, seat.z)
     dummy.updateMatrix()
@@ -158,8 +167,7 @@ export function addSeating(parent: THREE.Group) {
   brackets.receiveShadow = true
   group.add(cushions, backs, brackets)
 
-  const steps = stairTreads(),
-    p0 = circulation.portalStart,
+  const p0 = circulation.portalStart,
     p1 = circulation.portalEnd
   const floor = rowSurfaceHeight(7),
     roof = rowSurfaceHeight(12)
@@ -201,7 +209,9 @@ export function addSeating(parent: THREE.Group) {
         2.37 / 9,
         (bowl.baseHeight - 0.2) / 9,
       )
-    steps.forEach((s) => tread(s.depth, s.height, s.run, s.rise))
+    stairTreads(seatingRows(axis.side)).forEach((s) =>
+      tread(s.depth, s.height, s.run, s.rise),
+    )
     box(
       flight,
       [circulation.portalWidth, 0.22, p1 - p0],
@@ -257,7 +267,7 @@ export function addSeating(parent: THREE.Group) {
     // Thin handrails run along the clear stair edges, stopping at the portal.
     for (const [start, end] of [
       [-2.37, p0],
-      [p1, bowl.rows * bowl.rowDepth],
+      [p1, seatingRows(axis.side) * bowl.rowDepth],
     ] as const) {
       const height = (depth: number) =>
         depth < 0
@@ -296,13 +306,34 @@ export function addSeating(parent: THREE.Group) {
         railMat,
       )
   }
-  group.add(
-    ringMesh(
-      [65, 83.5, 36.5, 18.2],
-      [63.5, 82, 35, 18.2],
-      concrete,
-      'Upper circulation',
-    ),
+  // The former full ring sliced through the west hospitality rooms at y=18.2.
+  const concourse: number[] = []
+  for (let side = 1; side < 8; side++) {
+    for (let i = 0; i < 64; i++) {
+      const s0 = sideStation(side, i / 64),
+        s1 = sideStation(side, (i + 1) / 64)
+      const a = bowlPoint(side, s0, 24.5),
+        b = bowlPoint(side, s1, 24.5)
+      const c = bowlPoint(side, s1, 26),
+        d = bowlPoint(side, s0, 26)
+      quad(
+        concourse,
+        [a.x, 18.2, a.z],
+        [b.x, 18.2, b.z],
+        [c.x, 18.2, c.z],
+        [d.x, 18.2, d.z],
+      )
+    }
+  }
+  const concourseGeometry = new THREE.BufferGeometry()
+  concourseGeometry.setAttribute(
+    'position',
+    new THREE.Float32BufferAttribute(concourse, 3),
   )
+  concourseGeometry.computeVertexNormals()
+  const upperCirculation = new THREE.Mesh(concourseGeometry, concrete)
+  upperCirculation.name = 'Upper circulation — public stands only'
+  group.add(upperCirculation)
+  addHospitality(group)
   return group
 }

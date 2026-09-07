@@ -80,7 +80,7 @@ The project was developed with AI assistance. The [reference audit](docs/referen
 
 The 3D scene is GPU intensive, so performance varies by device. GLB consumers need support for `EXT_mesh_gpu_instancing`. There is no server rendering or offline service worker.
 
-Further reading: [model assumptions](docs/model-assumptions.md), [façade study](docs/facade-photo-analysis.md), [staircase study](docs/staircase-photo-analysis.md), [landscape reconstruction](docs/landscape-reconstruction.md), and [stadium fact sources](docs/stadium-facts-research.md). Historical verification notes describe their respective development snapshots; model exports can be regenerated in the app.
+Further reading: [model assumptions](docs/model-assumptions.md), [goals and Sector A research and validation](docs/goals-sector-a-research.md), [façade study](docs/facade-photo-analysis.md), [staircase study](docs/staircase-photo-analysis.md), [landscape reconstruction](docs/landscape-reconstruction.md), and [stadium fact sources](docs/stadium-facts-research.md). Historical verification notes describe their respective development snapshots; model exports can be regenerated in the app.
 
 ## Credits and asset rights
 

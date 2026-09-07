@@ -1,4 +1,5 @@
 import { expect, test } from 'bun:test'
+import type { InstancedMesh } from 'three'
 import {
   aisleAxes,
   bowlPoint,
@@ -78,4 +79,40 @@ test('chair footprint clearance extends beyond the concrete cutout', () => {
   const nearRail = { ...stair, z: stair.z + 0.95 }
   expect(circulationAt(nearRail, 12)).toBeUndefined()
   expect(circulationAt(nearRail, 12, 0.28)?.kind).toBe('stair')
+})
+
+test('Sector A replaces upper ordinary chairs and terraces with hospitality while retaining the opposite stand', async () => {
+  const THREE = await import('three')
+  const { addSeating } = await import('./seating')
+  const { disposeGroup } = await import('./geometry')
+  const root = new THREE.Group()
+  const seating = addSeating(root)
+  const chairs = seating.getObjectByName(
+    'Moulded red and white seat pans',
+  ) as InstancedMesh
+  const matrix = new THREE.Matrix4()
+  let lowerA = 0,
+    upperA = 0,
+    upperOpposite = 0
+  for (let i = 0; i < chairs.count; i++) {
+    chairs.getMatrixAt(i, matrix)
+    const p = new THREE.Vector3().setFromMatrixPosition(matrix)
+    if (Math.abs(p.z) >= 46) continue
+    if (p.x > 39 && p.x < 51.64) lowerA++
+    if (p.x >= 51.64) upperA++
+    if (p.x < -51.64) upperOpposite++
+  }
+  expect(lowerA).toBeGreaterThan(1000)
+  expect(upperA).toBe(0)
+  expect(upperOpposite).toBeGreaterThan(1000)
+  root.updateMatrixWorld(true)
+  const terraces = seating.getObjectByName(
+    'Precast seating treads — cut around stairs and entrances',
+  )!
+  const ray = new THREE.Raycaster(
+    new THREE.Vector3(57, 30, 10),
+    new THREE.Vector3(0, -1, 0),
+  )
+  expect(ray.intersectObject(terraces).length).toBe(0)
+  disposeGroup(root)
 })

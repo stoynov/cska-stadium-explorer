@@ -16,8 +16,9 @@ Prepared 6 September 2026. This is an interpretation of the intended completed B
 | --- | --- | --- |
 | Footprint | Rounded rectangle, approximately 146 × 187 m at the outer façade | Visual proportion estimate; no survey drawings |
 | Pitch | 105 × 68 m, long axis along local Z; centre at local origin | Explicit standard-size modelling assumption, not a verified CSKA dimension |
-| Coordinates | Local X across pitch, local Z along pitch, Y up; entrance on +X, lettering on −X | No true-north alignment or official sector assignments implied |
-| Bowl | One continuous tier, 31 procedural rows, 0.79 m row depth and 0.535 m rise; radial aisles and 20 approximate access axes with recessed portals, separate stair flights and landings | Counts and profiles selected for visual coherence, not official seating documentation |
+| Coordinates | Local X across pitch, local Z along pitch, Y up; Sector A hospitality and entrance on +X, lettering on −X | Sector A assigned from entrance-side photographic evidence; no true-north alignment implied |
+| Bowl | 31 procedural rows on the general stands; Sector A has a shorter lower tier and a dedicated hospitality block with lounge and skybox terraces; radial aisles and approximate recessed portals, separate stair flights and landings | Counts and profiles selected for visual coherence, not official seating documentation; see the [Sector A research](goals-sector-a-research.md) |
+| Goals | Connected rear, side and top nets with open fronts; grounded frames with clear 7.32 × 2.44 m openings aligned with the painted goal lines | Opening and frame thickness follow IFAB Law 1; net depths, subdivision and supports are visualization assumptions |
 | Seats | Instanced cushions/backs, primarily red, white mosaic ЦСКА on far long stand | Letter placement supported by aerial; exact typography, glyph proportions approximated; unsupported scattered white seats and end stripes removed in the staircase correction |
 | Capacity | Not displayed | Generated chair count is a rendering implementation detail, not stadium capacity |
 | Façade | Champagne/gold horizontal louvers, 54 modelled courses over a dark backing, curved corners and raised lower edges around entrances | Material tone and lower-edge rhythm follow photographs; exact construction spacing and entrance profile are not measured |
