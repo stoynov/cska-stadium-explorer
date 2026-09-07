@@ -1,0 +1,260 @@
+{
+  "assets": [
+    {
+      "contentType": "image/jpeg",
+      "id": "91be8bc548f13fd1",
+      "kind": "image",
+      "name": "DJI_20260809160800_0092_D-845x684.jpg",
+      "path": "public/assets/cska/DJI_20260809160800_0092_D-845x684.jpg",
+      "url": "https://stadium.cska.bg/wp-content/uploads/2026/08/DJI_20260809160800_0092_D-845x684.jpg",
+      "retrievedAt": "2026-09-06",
+      "sourcePage": "https://stadium.cska.bg/",
+      "category": "construction-photo"
+    },
+    {
+      "contentType": "image/jpeg",
+      "id": "30dcaee43566280f",
+      "kind": "image",
+      "name": "DJI_20260809160800_0092_D-2048x1152.jpg",
+      "path": "public/assets/cska/DJI_20260809160800_0092_D-2048x1152.jpg",
+      "url": "https://stadium.cska.bg/wp-content/uploads/2026/08/DJI_20260809160800_0092_D-2048x1152.jpg",
+      "retrievedAt": "2026-09-06",
+      "sourcePage": "https://stadium.cska.bg/",
+      "category": "construction-photo"
+    },
+    {
+      "contentType": "image/png",
+      "id": "652a24208122ea3a",
+      "kind": "image",
+      "name": "cska_logo-229x300.png",
+      "path": "public/assets/cska/cska_logo-229x300.png",
+      "url": "https://stadium.cska.bg/wp-content/uploads/2024/09/cska_logo-229x300.png",
+      "retrievedAt": "2026-09-06",
+      "sourcePage": "https://stadium.cska.bg/",
+      "category": "club-crest"
+    },
+    {
+      "contentType": "image/jpeg",
+      "id": "2f54ba5e383b00ed",
+      "kind": "image",
+      "name": "DJI_20260809160419_0087_D-845x684.jpg",
+      "path": "public/assets/cska/DJI_20260809160419_0087_D-845x684.jpg",
+      "url": "https://stadium.cska.bg/wp-content/uploads/2026/08/DJI_20260809160419_0087_D-845x684.jpg",
+      "retrievedAt": "2026-09-06",
+      "sourcePage": "https://stadium.cska.bg/",
+      "category": "construction-photo"
+    },
+    {
+      "contentType": "image/jpeg",
+      "id": "a0d29a9ad739f374",
+      "kind": "image",
+      "name": "DJI_20260809160303_0086_D-845x684.jpg",
+      "path": "public/assets/cska/DJI_20260809160303_0086_D-845x684.jpg",
+      "url": "https://stadium.cska.bg/wp-content/uploads/2026/08/DJI_20260809160303_0086_D-845x684.jpg",
+      "retrievedAt": "2026-09-06",
+      "sourcePage": "https://stadium.cska.bg/",
+      "category": "construction-photo"
+    },
+    {
+      "contentType": "image/jpeg",
+      "id": "2778c49d66e39c9f",
+      "kind": "image",
+      "name": "DJI_20260809160553_0089_D-845x684.jpg",
+      "path": "public/assets/cska/DJI_20260809160553_0089_D-845x684.jpg",
+      "url": "https://stadium.cska.bg/wp-content/uploads/2026/08/DJI_20260809160553_0089_D-845x684.jpg",
+      "retrievedAt": "2026-09-06",
+      "sourcePage": "https://stadium.cska.bg/",
+      "category": "construction-photo"
+    },
+    {
+      "contentType": "image/jpeg",
+      "id": "d610aae36c4d1ea0",
+      "kind": "image",
+      "name": "DJI_20260809160640_0090_D-845x684.jpg",
+      "path": "public/assets/cska/DJI_20260809160640_0090_D-845x684.jpg",
+      "url": "https://stadium.cska.bg/wp-content/uploads/2026/08/DJI_20260809160640_0090_D-845x684.jpg",
+      "retrievedAt": "2026-09-06",
+      "sourcePage": "https://stadium.cska.bg/",
+      "category": "construction-photo"
+    },
+    {
+      "contentType": "image/jpeg",
+      "id": "b45569aae44738c0",
+      "kind": "image",
+      "name": "DJI_20260809160716_0091_D-845x684.jpg",
+      "path": "public/assets/cska/DJI_20260809160716_0091_D-845x684.jpg",
+      "url": "https://stadium.cska.bg/wp-content/uploads/2026/08/DJI_20260809160716_0091_D-845x684.jpg",
+      "retrievedAt": "2026-09-06",
+      "sourcePage": "https://stadium.cska.bg/",
+      "category": "construction-photo"
+    },
+    {
+      "contentType": "image/jpeg",
+      "id": "e7f32a398044a621",
+      "kind": "image",
+      "name": "DJI_20260809160848_0094_D-845x684.jpg",
+      "path": "public/assets/cska/DJI_20260809160848_0094_D-845x684.jpg",
+      "url": "https://stadium.cska.bg/wp-content/uploads/2026/08/DJI_20260809160848_0094_D-845x684.jpg",
+      "retrievedAt": "2026-09-06",
+      "sourcePage": "https://stadium.cska.bg/",
+      "category": "construction-photo"
+    },
+    {
+      "contentType": "image/jpeg",
+      "id": "d4abfb739090ce62",
+      "kind": "image",
+      "name": "DJI_20260809160915_0095_D-845x684.jpg",
+      "path": "public/assets/cska/DJI_20260809160915_0095_D-845x684.jpg",
+      "url": "https://stadium.cska.bg/wp-content/uploads/2026/08/DJI_20260809160915_0095_D-845x684.jpg",
+      "retrievedAt": "2026-09-06",
+      "sourcePage": "https://stadium.cska.bg/",
+      "category": "construction-photo"
+    },
+    {
+      "contentType": "image/jpeg",
+      "id": "bdc64b65a10567bf",
+      "kind": "image",
+      "name": "DJI_20260809161028_0097_D-845x684.jpg",
+      "path": "public/assets/cska/DJI_20260809161028_0097_D-845x684.jpg",
+      "url": "https://stadium.cska.bg/wp-content/uploads/2026/08/DJI_20260809161028_0097_D-845x684.jpg",
+      "retrievedAt": "2026-09-06",
+      "sourcePage": "https://stadium.cska.bg/",
+      "category": "construction-photo"
+    },
+    {
+      "contentType": "image/jpeg",
+      "id": "9024b3f20b70a66a",
+      "kind": "image",
+      "name": "DJI_20260809161157_0099_D-845x684.jpg",
+      "path": "public/assets/cska/DJI_20260809161157_0099_D-845x684.jpg",
+      "url": "https://stadium.cska.bg/wp-content/uploads/2026/08/DJI_20260809161157_0099_D-845x684.jpg",
+      "retrievedAt": "2026-09-06",
+      "sourcePage": "https://stadium.cska.bg/",
+      "category": "construction-photo"
+    },
+    {
+      "contentType": "image/jpeg",
+      "id": "cbe4907e167a4e7e",
+      "kind": "image",
+      "name": "DJI_20260809161001_0096_D-845x684.jpg",
+      "path": "public/assets/cska/DJI_20260809161001_0096_D-845x684.jpg",
+      "url": "https://stadium.cska.bg/wp-content/uploads/2026/08/DJI_20260809161001_0096_D-845x684.jpg",
+      "retrievedAt": "2026-09-06",
+      "sourcePage": "https://stadium.cska.bg/",
+      "category": "construction-photo"
+    },
+    {
+      "contentType": "image/jpeg",
+      "id": "cf7f7abc75845b80",
+      "kind": "image",
+      "name": "DJI_20260809161232_0100_D-845x684.jpg",
+      "path": "public/assets/cska/DJI_20260809161232_0100_D-845x684.jpg",
+      "url": "https://stadium.cska.bg/wp-content/uploads/2026/08/DJI_20260809161232_0100_D-845x684.jpg",
+      "retrievedAt": "2026-09-06",
+      "sourcePage": "https://stadium.cska.bg/",
+      "category": "construction-photo"
+    },
+    {
+      "contentType": "image/jpeg",
+      "id": "74b9b62898d77d2d",
+      "kind": "image",
+      "name": "DJI_20260809161300_0102_D-845x684.jpg",
+      "path": "public/assets/cska/DJI_20260809161300_0102_D-845x684.jpg",
+      "url": "https://stadium.cska.bg/wp-content/uploads/2026/08/DJI_20260809161300_0102_D-845x684.jpg",
+      "retrievedAt": "2026-09-06",
+      "sourcePage": "https://stadium.cska.bg/",
+      "category": "construction-photo"
+    },
+    {
+      "contentType": "image/jpeg",
+      "id": "b4a515abbba5fdd0",
+      "kind": "image",
+      "name": "DJI_20260809161340_0103_D-845x684.jpg",
+      "path": "public/assets/cska/DJI_20260809161340_0103_D-845x684.jpg",
+      "url": "https://stadium.cska.bg/wp-content/uploads/2026/08/DJI_20260809161340_0103_D-845x684.jpg",
+      "retrievedAt": "2026-09-06",
+      "sourcePage": "https://stadium.cska.bg/",
+      "category": "construction-photo"
+    },
+    {
+      "contentType": "image/jpeg",
+      "id": "9114a5e9a9f42d0d",
+      "kind": "image",
+      "name": "DJI_20260809161355_0104_D-845x684.jpg",
+      "path": "public/assets/cska/DJI_20260809161355_0104_D-845x684.jpg",
+      "url": "https://stadium.cska.bg/wp-content/uploads/2026/08/DJI_20260809161355_0104_D-845x684.jpg",
+      "retrievedAt": "2026-09-06",
+      "sourcePage": "https://stadium.cska.bg/",
+      "category": "construction-photo"
+    },
+    {
+      "contentType": "image/jpeg",
+      "id": "6a7f5ae3e818b84d",
+      "kind": "image",
+      "name": "DJI_20260809161532_0106_D-845x684.jpg",
+      "path": "public/assets/cska/DJI_20260809161532_0106_D-845x684.jpg",
+      "url": "https://stadium.cska.bg/wp-content/uploads/2026/08/DJI_20260809161532_0106_D-845x684.jpg",
+      "retrievedAt": "2026-09-06",
+      "sourcePage": "https://stadium.cska.bg/",
+      "category": "construction-photo"
+    },
+    {
+      "contentType": "image/jpeg",
+      "id": "0dcec6cc9c84e24d",
+      "kind": "image",
+      "name": "DJI_20260809161439_0105_D-845x684.jpg",
+      "path": "public/assets/cska/DJI_20260809161439_0105_D-845x684.jpg",
+      "url": "https://stadium.cska.bg/wp-content/uploads/2026/08/DJI_20260809161439_0105_D-845x684.jpg",
+      "retrievedAt": "2026-09-06",
+      "sourcePage": "https://stadium.cska.bg/",
+      "category": "construction-photo"
+    },
+    {
+      "contentType": "image/jpeg",
+      "id": "ab781055674f8844",
+      "kind": "image",
+      "name": "red_8.jpg",
+      "path": "public/assets/cska/red_8.jpg",
+      "url": "https://stadium.cska.bg/wp-content/uploads/2025/08/red_8.jpg",
+      "retrievedAt": "2026-09-06",
+      "sourcePage": "https://stadium.cska.bg/",
+      "category": "archive-image"
+    },
+    {
+      "contentType": "image/jpeg",
+      "id": "ffac3b7bf847a1a4",
+      "kind": "image",
+      "name": "22142-CAM-002-scaled.jpg",
+      "path": "public/assets/cska/22142-CAM-002-scaled.jpg",
+      "url": "https://stadium.cska.bg/wp-content/uploads/2024/09/22142-CAM-002-scaled.jpg",
+      "retrievedAt": "2026-09-06",
+      "sourcePage": "https://stadium.cska.bg/",
+      "category": "architectural-render"
+    },
+    {
+      "contentType": "image/jpeg",
+      "id": "0035fcfd026421a8",
+      "kind": "image",
+      "name": "22142-CAM-004-300x169.jpg",
+      "path": "public/assets/cska/22142-CAM-004-300x169.jpg",
+      "url": "https://stadium.cska.bg/wp-content/uploads/2024/09/22142-CAM-004-300x169.jpg",
+      "retrievedAt": "2026-09-06",
+      "sourcePage": "https://stadium.cska.bg/",
+      "category": "architectural-render"
+    }
+  ],
+  "failures": [],
+  "derivatives": [
+    {
+      "path": "public/assets/cska/optimized/stadium-render.jpg",
+      "original": "public/assets/cska/22142-CAM-002-scaled.jpg",
+      "dimensions": [
+        1600,
+        900
+      ],
+      "encoding": "JPEG quality 50 using macOS sips",
+      "purpose": "Local loading backdrop, About image and WebGL fallback",
+      "createdAt": "2026-09-06"
+    }
+  ]
+}

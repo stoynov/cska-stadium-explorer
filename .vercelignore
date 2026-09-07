@@ -1,0 +1,7 @@
+docs/
+prompts/
+scripts/
+.github/
+**/*.test.ts
+README.md
+*.tsbuildinfo

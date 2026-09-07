@@ -1,0 +1,27 @@
+{
+  "bytes": 13586808,
+  "magic": "0x46546c67",
+  "version": 2,
+  "declaredLength": 13586808,
+  "generator": "THREE.GLTFExporter r185",
+  "nodes": 47,
+  "meshes": 42,
+  "materials": 31,
+  "images": 3,
+  "embeddedImages": true,
+  "roofNodes": [
+    "Complete roof canopy and steel structure",
+    "Complete roof canopy and steel structure / surfaces",
+    "Complete roof canopy and steel structure / surfaces",
+    "Complete roof canopy and steel structure / surfaces",
+    "Complete roof canopy and steel structure / surfaces",
+    "Complete roof canopy and steel structure / surfaces",
+    "Complete roof canopy and steel structure / surfaces",
+    "Complete roof canopy and steel structure / surfaces"
+  ],
+  "landscapeNodes": [],
+  "extensionsUsed": [
+    "EXT_mesh_gpu_instancing",
+    "KHR_materials_emissive_strength"
+  ]
+}

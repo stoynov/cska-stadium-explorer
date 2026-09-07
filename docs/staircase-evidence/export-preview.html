@@ -1,0 +1,10 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>CSKA export re-import verification</title><style>body{margin:0;background:#14251f;color:#fff;font:14px system-ui}#result{position:fixed;top:20px;left:24px;padding:14px;background:#14251fcc;z-index:1}canvas{display:block}</style><div id="result">Loading the downloaded GLB…</div><script type="module">
+import * as THREE from 'three';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setSize(innerWidth,innerHeight);renderer.toneMapping=THREE.ACESFilmicToneMapping;document.body.append(renderer.domElement);
+const scene=new THREE.Scene();scene.background=new THREE.Color('#829080');scene.add(new THREE.HemisphereLight('#f0f2e4','#575d47',2));const sun=new THREE.DirectionalLight('#fff1d8',3);sun.position.set(90,170,-85);scene.add(sun);
+const camera=new THREE.PerspectiveCamera(43,innerWidth/innerHeight,.2,1800);camera.position.set(22,26,10);const controls=new OrbitControls(camera,renderer.domElement);controls.target.set(-43,9,0);controls.update();
+new GLTFLoader().load('./cska-stairs.glb',g=>{scene.add(g.scene);const roof=g.scene.getObjectByName('Complete_roof_canopy_and_steel_structure');let instances=0;g.scene.traverse(o=>{if(o.isInstancedMesh)instances+=o.count});document.querySelector('#result').textContent=`GLB loaded · roof ${roof?.visible?'present and visible':'MISSING'} · ${instances.toLocaleString()} instances · embedded pitch, signage and crest textures`;},undefined,e=>{document.querySelector('#result').textContent='GLB failed: '+String(e)});
+renderer.setAnimationLoop(()=>{controls.update();renderer.render(scene,camera)});addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+</script></html>

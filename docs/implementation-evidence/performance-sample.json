@@ -1,0 +1,10 @@
+{
+  "date": "2026-09-06",
+  "browser": "Chrome on the connected macOS host",
+  "viewport": [1728, 865],
+  "seconds": 10.01,
+  "frames": 703,
+  "averageRAF": 70.3,
+  "source": "Visible performance-result output in runtime-check.html?mode=performance",
+  "note": "Animation-frame cadence in the automated browser, not a GPU or physical-phone benchmark. Hardware model unavailable. No sustained mobile FPS claim."
+}

@@ -1,0 +1,17 @@
+node_modules/
+dist/
+*.tsbuildinfo
+.DS_Store
+.env
+.env.*
+!.env.example
+.vercel/
+.idea/
+.vscode/
+coverage/
+*.log
+
+# Local research downloads and regenerable model exports.
+docs/reference-evidence/
+docs/**/*.glb
+docs/portfolio-before.png

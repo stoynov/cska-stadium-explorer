@@ -1,0 +1,155 @@
+{
+  "schemaVersion": 1,
+  "auditedAt": "2026-09-06",
+  "referenceUrl": "https://gpt-6-stadium.vercel.app/",
+  "method": "Rendered-page asset inventory, DOM-backed iframe/source links, public stylesheet bundle, and user-facing downloads.",
+  "assets": [
+    {
+      "url": "https://gpt-6-stadium.vercel.app/assets/index-B9cravj9.js",
+      "type": "script",
+      "purpose": "Public application bundle; observed URL only, source not analyzed.",
+      "sourcePage": "https://gpt-6-stadium.vercel.app/",
+      "observedAt": "2026-09-06",
+      "reuseStatus": "Unknown; no reuse license verified. Research reference only.",
+      "downloadedForAudit": false
+    },
+    {
+      "url": "https://gpt-6-stadium.vercel.app/assets/index-C_8T8JPF.css",
+      "type": "stylesheet",
+      "purpose": "Public stylesheet; downloaded and inspected for layout, breakpoints, and visual tokens.",
+      "sourcePage": "https://gpt-6-stadium.vercel.app/",
+      "observedAt": "2026-09-06",
+      "reuseStatus": "Unknown; no reuse license verified. Research reference only.",
+      "downloadedForAudit": true,
+      "localPath": "docs/reference-evidence/reference.css"
+    },
+    {
+      "url": "https://gpt-6-stadium.vercel.app/brand/galatasaray-five-stars.png",
+      "type": "image",
+      "purpose": "Displayed crest in the venue identity block.",
+      "sourcePage": "https://gpt-6-stadium.vercel.app/",
+      "observedAt": "2026-09-06",
+      "reuseStatus": "Unknown; no reuse license verified. Research reference only.",
+      "downloadedForAudit": false
+    },
+    {
+      "url": "https://gpt-6-stadium.vercel.app/api/presence",
+      "type": "other",
+      "purpose": "Observed public endpoint resource associated with visitor presence; response and backend semantics not inspected.",
+      "sourcePage": "https://gpt-6-stadium.vercel.app/",
+      "observedAt": "2026-09-06",
+      "reuseStatus": "Unknown; no reuse license verified. Research reference only.",
+      "downloadedForAudit": false
+    },
+    {
+      "url": "https://gpt-6-stadium.vercel.app/brand/galatasaray.png",
+      "type": "image",
+      "purpose": "Observed club image resource; its precise use within the scene was not isolated.",
+      "sourcePage": "https://gpt-6-stadium.vercel.app/",
+      "observedAt": "2026-09-06",
+      "reuseStatus": "Unknown; no reuse license verified. Research reference only.",
+      "downloadedForAudit": false
+    },
+    {
+      "url": "https://gpt-6-stadium.vercel.app/brand/champions-league.svg",
+      "type": "image",
+      "purpose": "Observed competition image resource; related formation selector is present, exact image-to-particle implementation not inspected.",
+      "sourcePage": "https://gpt-6-stadium.vercel.app/",
+      "observedAt": "2026-09-06",
+      "reuseStatus": "Unknown; no reuse license verified. Research reference only.",
+      "downloadedForAudit": false
+    },
+    {
+      "url": "https://open.spotify.com/embed/iframe-api/v1",
+      "type": "script",
+      "purpose": "External player API script observed after soundtrack selection.",
+      "sourcePage": "https://gpt-6-stadium.vercel.app/",
+      "observedAt": "2026-09-06",
+      "reuseStatus": "Unknown; no reuse license verified. Research reference only.",
+      "downloadedForAudit": false
+    },
+    {
+      "url": "https://embed-cdn.spotifycdn.com/_next/static/iframe_api.5d9c278414aa26159427.js",
+      "type": "script",
+      "purpose": "External player script loaded during music selection.",
+      "sourcePage": "https://gpt-6-stadium.vercel.app/",
+      "observedAt": "2026-09-06",
+      "reuseStatus": "Unknown; no reuse license verified. Research reference only.",
+      "downloadedForAudit": false
+    },
+    {
+      "url": "https://open.spotify.com/embed/track/2ugp0H51dQ6n6dnFzhhtHh?utm_source=iframe-api&enableMusicVideo=1",
+      "type": "other",
+      "purpose": "Selected anthem player iframe; selection verified, audible playback unverified.",
+      "sourcePage": "https://gpt-6-stadium.vercel.app/",
+      "observedAt": "2026-09-06",
+      "reuseStatus": "Unknown; no reuse license verified. Research reference only.",
+      "downloadedForAudit": false
+    },
+    {
+      "url": "https://www.galatasaray.org/s/ali-sami-yen-spor-kompleksi-nef-stadyumu/202",
+      "type": "source-link",
+      "purpose": "Architectural source linked by the About dialog; destination content not inspected in this audit.",
+      "sourcePage": "https://gpt-6-stadium.vercel.app/",
+      "observedAt": "2026-09-06",
+      "reuseStatus": "Source citation only."
+    },
+    {
+      "url": "https://open.spotify.com/track/2ugp0H51dQ6n6dnFzhhtHh",
+      "type": "source-link",
+      "purpose": "External anthem track link exposed by music panel.",
+      "sourcePage": "https://gpt-6-stadium.vercel.app/",
+      "observedAt": "2026-09-06",
+      "reuseStatus": "External service link; no audio reuse rights established."
+    }
+  ],
+  "generatedExports": [
+    {
+      "type": "image/png",
+      "sourcePage": "https://gpt-6-stadium.vercel.app/",
+      "delivery": "Generated client-side; saved through capture panel. Blob URL intentionally omitted because it is session-scoped.",
+      "originalFileName": "my-stadium.png",
+      "localPath": "docs/reference-evidence/12-exported-capture.png",
+      "width": 2520,
+      "height": 1575,
+      "contentsVerified": [
+        "rendered stadium",
+        "surrounding scene",
+        "night lighting",
+        "CSKA drone message",
+        "branded caption strip"
+      ],
+      "excludedFromImage": [
+        "normal HTML toolbar",
+        "chapter navigation",
+        "language switch"
+      ],
+      "reuseStatus": "Research evidence; contains third-party identity. Do not use as a CSKA runtime asset."
+    },
+    {
+      "type": "model/gltf-binary",
+      "sourcePage": "https://gpt-6-stadium.vercel.app/",
+      "delivery": "User-facing Download GLB action; no static model URL observed.",
+      "originalFileName": "rams-park-reference-model-metres (1).glb",
+      "localPath": "docs/reference-evidence/reference-export.glb",
+      "bytes": 19230668,
+      "generator": "THREE.GLTFExporter r185",
+      "inspectionPath": "docs/reference-evidence/glb-inspection.json",
+      "validation": "Header, JSON, binary chunk, buffer-view bounds, and instancing metadata inspected. Visual re-import not performed.",
+      "reuseStatus": "Download offered by reference; reuse license not verified. Research evidence only, not CSKA geometry."
+    }
+  ],
+  "cskaAssets": {
+    "sourcePage": "https://stadium.cska.bg/",
+    "manifestPath": "public/assets/cska/manifest.json",
+    "downloadedImageCount": 22,
+    "note": "Existing official image downloads from prior prompt-writing task; unchanged in this audit."
+  },
+  "notEstablished": [
+    "Original frontend framework",
+    "Availability of an original downloadable source repository",
+    "Static URL for the procedural/exported stadium model",
+    "Audio licensing or playback authorization",
+    "Presence response schema or deduplication accuracy"
+  ]
+}

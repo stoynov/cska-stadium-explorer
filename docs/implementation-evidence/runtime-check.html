@@ -1,0 +1,22 @@
+<!doctype html><html lang="bg"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>CSKA simulated runtime checks</title><div id="root"></div><script type="module">
+// Local QA fixture only: Vite's production entry excludes this file.
+// Simulate browser capability responses before loading the unmodified app.
+const mode=new URLSearchParams(location.search).get('mode');
+if(mode==='reduced'){
+  const original=window.matchMedia.bind(window);
+  window.matchMedia=query=>query.includes('prefers-reduced-motion')?Object.assign(new EventTarget(),{matches:true,media:query,onchange:null,addListener(){},removeListener(){}}):original(query);
+  const style=document.createElement('style');style.textContent='*,*:before,*:after{animation:none!important;transition:none!important}';document.head.append(style);
+}
+if(mode==='no-webgl'){
+  const original=HTMLCanvasElement.prototype.getContext;
+  HTMLCanvasElement.prototype.getContext=function(type,...args){return String(type).includes('webgl')?null:original.call(this,type,...args)};
+}
+if(mode==='missing-crest'){
+  const {assets}=await import('/src/config/assets.ts');assets.crest='/assets/cska/__qa-missing-crest.png';
+}
+await import('/src/main.tsx');
+if(mode==='performance'){
+  const output=document.createElement('output');output.id='performance-result';output.style.cssText='position:fixed;top:170px;right:30px;z-index:100;background:#14251fe8;color:white;padding:12px;font:12px system-ui';output.textContent='Measuring animation cadence for 10 seconds…';document.body.append(output);
+  setTimeout(()=>{const start=performance.now();let frames=0;function sample(now){frames++;if(now-start<10000){requestAnimationFrame(sample)}else{output.textContent=JSON.stringify({viewport:[innerWidth,innerHeight],seconds:((now-start)/1000).toFixed(2),frames,averageRAF:(frames*1000/(now-start)).toFixed(1),note:'Animation-frame cadence, not a GPU or physical-phone benchmark'});}}requestAnimationFrame(sample)},2000);
+}
+</script></html>

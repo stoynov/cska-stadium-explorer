@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.vercel/
+bun.lock
+src/scene/data/
+public/
+docs/
+prompts/
