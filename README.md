@@ -56,11 +56,21 @@ The regression suite covers viewer transitions, geometry, staircase clearance, f
 | `src/content*.ts`              | English and Bulgarian copy                                         |
 | `scripts/`                     | Offline geographic data preparation                                |
 
-## Deploy to Vercel
+## Deployment and releases
 
-Import this repository into Vercel. The checked-in `vercel.json` selects Vite, installs dependencies with the frozen Bun lockfile, runs `bun run build`, and serves `dist/`. No environment variables are required. Once the Git integration is connected, pushes to `main` publish production updates and pull requests receive preview deployments.
+The live site is deployed in the **stoynov-proj** Vercel workspace, connected to this repository. Push to `main` to publish a production update; pull requests receive checks and Vercel previews.
 
-The configuration follows [Vercel’s Vite deployment documentation](https://vercel.com/docs/frameworks/frontend/vite). Research notes and source tests are excluded from CLI uploads with `.vercelignore`.
+1. **CI** (`.github/workflows/ci.yml`) installs the frozen Bun lockfile, checks formatting, runs regression tests, validates TypeScript, and builds the site. Production builds are archived as workflow artifacts for 14 days.
+2. **Vercel** automatically builds the same commit through its Git integration. `vercel.json` runs `bun run check` before publishing `dist/`, so failed checks prevent deployment. GitHub CI and Vercel validate independently.
+3. **Verify deployment and release** (`.github/workflows/release.yml`) runs only after production CI succeeds. It waits up to 10 minutes for Vercel to report success for that exact commit, then creates a tag and publishes a [GitHub release](https://github.com/stoynov/cska-stadium-explorer/releases).
+
+Tags use `build-<CI run number>` (for example, `build-3`). These identify production builds, independently of the package version. Each release includes generated change notes, the commit and deployment links, `cska-stadium-explorer.tar.gz`, `build-info.txt`, and `SHA256SUMS`. The archive is the verified **CI build**; Vercel builds its own copy from the same source commit.
+
+Re-running a workflow keeps its existing tag and release. Published releases are not overwritten, and tags are never moved. A new manual run of **CI → Run workflow → main** creates a new build release. If Vercel fails or the deployment wait times out, fix/redeploy that commit and re-run the failed jobs. Pull requests, unsuccessful builds, and skipped deployments do not receive production releases. Outdated PR checks are cancelled; production runs are retained.
+
+No API keys or extra repository secrets are required. The existing Vercel GitHub App handles deployment; the release job uses GitHub's temporary `GITHUB_TOKEN` with narrowly scoped permissions. Actions are pinned to commit SHAs. Deployment coordination uses [Vercel’s official wait action](https://github.com/vercel/wait-for-deployment-action).
+
+For a rollback, use Vercel’s project dashboard to promote a previous successful production deployment, then revert the faulty source commit in GitHub so subsequent pushes preserve the fix. Previous builds remain downloadable from Releases.
 
 ## Design process and limitations
 

@@ -1,0 +1,125 @@
+name: Verify deployment and release
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      actions: read
+      deployments: read
+      statuses: read
+    env:
+      BUILD_TAG: build-${{ github.run_number }}
+    steps:
+      # Vercel's Git integration deploys this SHA using vercel.json.
+      # This action observes that deployment without requiring a Vercel secret.
+      - name: Wait for the production deployment of this commit
+        id: deployment
+        uses: vercel/wait-for-deployment-action@0e2b0c5c5cce31f1648108aeec56467187aca037
+        with:
+          environment: production
+          sha: ${{ github.sha }}
+          timeout: '600'
+          require-deployment-id: 'false'
+      - name: Require evidence of a successful deployment
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        env:
+          DEPLOYMENT_STATE: ${{ steps.deployment.outputs.deployment-state }}
+        with:
+          script: |
+            if (process.env.DEPLOYMENT_STATE === 'success') return;
+            // An older successful build can become inactive when a newer one goes live.
+            // A build that was only skipped must never be released as successful.
+            const deployments = await github.paginate(github.rest.repos.listDeployments, {
+              ...context.repo, sha: context.sha, environment: 'Production', per_page: 100,
+            });
+            for (const deployment of deployments.filter(d => d.creator?.login === 'vercel[bot]')) {
+              const statuses = await github.paginate(github.rest.repos.listDeploymentStatuses, {
+                ...context.repo, deployment_id: deployment.id, per_page: 100,
+              });
+              if (statuses.some(s => s.state === 'success' && s.creator?.login === 'vercel[bot]')) return;
+            }
+            throw new Error('No successful production deployment found for this commit. Redeploy it and re-run the failed job.');
+      - name: Download the verified build from this CI run
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: production-build-${{ github.sha }}
+          path: release
+      - name: Verify the release archive
+        working-directory: release
+        run: sha256sum --check SHA256SUMS
+      - name: Create the immutable tag and draft release
+        id: release
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        env:
+          DEPLOYMENT_URL: ${{ steps.deployment.outputs.deployment-url }}
+        with:
+          script: |
+            const repo = context.repo;
+            const tag = process.env.BUILD_TAG;
+            const sha = context.sha;
+            try {
+              const { data: ref } = await github.rest.git.getRef({ ...repo, ref: `tags/${tag}` });
+              if (ref.object.sha !== sha) throw new Error(`${tag} already points to another commit`);
+            } catch (error) {
+              if (error.status !== 404) throw error;
+              await github.rest.git.createRef({ ...repo, ref: `refs/tags/${tag}`, sha });
+            }
+            let release;
+            try {
+              ({ data: release } = await github.rest.repos.getReleaseByTag({ ...repo, tag }));
+            } catch (error) {
+              if (error.status !== 404) throw error;
+              const { data: notes } = await github.rest.repos.generateReleaseNotes({
+                ...repo, tag_name: tag, target_commitish: sha,
+              });
+              const body = [
+                'Verified production build of CSKA Stadium Explorer.',
+                '**Live site:** https://cska-stadium-explorer.vercel.app',
+                `**Deployment:** ${process.env.DEPLOYMENT_URL}`,
+                `**Commit:** ${sha}`,
+                `**CI:** ${context.serverUrl}/${repo.owner}/${repo.repo}/actions/runs/${context.runId}`,
+                'The attached archive contains the CI-built static site. Verify it with `sha256sum --check SHA256SUMS`.',
+                notes.body,
+              ].join('\n\n');
+              ({ data: release } = await github.rest.repos.createRelease({
+                ...repo, tag_name: tag, target_commitish: sha,
+                name: `Production build ${context.runNumber}`,
+                body, draft: true, prerelease: false,
+              }));
+            }
+            core.setOutput('id', release.id);
+            core.setOutput('draft', String(release.draft));
+            core.setOutput('url', release.html_url);
+      - name: Attach the production archive and checksum
+        if: steps.release.outputs.draft == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: gh release upload "$BUILD_TAG" release/cska-stadium-explorer.tar.gz release/SHA256SUMS release/build-info.txt --clobber
+      - name: Publish the completed release
+        if: steps.release.outputs.draft == 'true'
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        env:
+          RELEASE_ID: ${{ steps.release.outputs.id }}
+        with:
+          script: |
+            const { data: main } = await github.rest.git.getRef({ ...context.repo, ref: 'heads/main' });
+            await github.rest.repos.updateRelease({
+              ...context.repo,
+              release_id: Number(process.env.RELEASE_ID),
+              draft: false,
+              make_latest: main.object.sha === context.sha ? 'true' : 'false',
+            });
+      - name: Write release summary
+        env:
+          RELEASE_URL: ${{ steps.release.outputs.url }}
+        run: printf '### Production release\n\n[%s](%s)\n\n[Live site](https://cska-stadium-explorer.vercel.app)\n' "$BUILD_TAG" "$RELEASE_URL" >> "$GITHUB_STEP_SUMMARY"
