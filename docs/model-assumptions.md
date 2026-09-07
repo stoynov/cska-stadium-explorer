@@ -28,7 +28,7 @@ Prepared 6 September 2026; updated 7 September 2026. This is an interpretation o
 | Signage | Official local crest and generated Bulgarian stadium-name texture | Small presentation placement interpreted, not signage construction drawings |
 | Lighting | Warm daylight; reduced ambient illumination, central pitch fill and emissive fixtures for evening | Artistic lighting, not a photometric simulation |
 | Park | Deterministically scattered trees, paths, promenade, plaza, benches and scale figures | Illustrative Borisova Gradina setting; paths and vegetation are not mapped or surveyed |
-| Main-stand corner entries | Two open passages below connecting galleries at the ends of Sector A; terrace exits and an interpreted return stair connect to the upper concourse | Supported by the user's clearer main-stand photograph; 7 m widths, elevations and stair routes are estimates, not construction documentation |
+| Main-stand corner entries | Two diagonal passages in the curved corner transitions; curved Silver galleries and transverse bridges connect to the adjacent public stairs | Supported by the user's clearer main-stand photograph; 45° axes, 7 m widths and elevations are estimates. See the [placement correction](angled-corner-research.md) |
 | Sofia context | OSM building footprints, major roads and woodland around the stadium; 18,000 buildings on desktop, 10,000 in the compact profile | Bounded selection within 4.3 km; most heights are derived from levels or estimated by building type. Simplified roofs and road widths; see [city validation](corner-city-validation.md) |
 
 ## Differences between evidence sources
@@ -58,4 +58,4 @@ The park now follows the visible entrance approach and curved lawn/path topology
 
 ## Corner entries and city revision — 2026-09-07
 
-See [research, implementation and validation](corner-city-validation.md). The adjacent bowl concrete and exterior glazing now have actual openings at both Sector A corners. The city uses an offline OSM extract, shared geographic coordinates and triangle-based terrain sampling. The local landscaped park remains an architectural interpretation; the wider footprints, road centrelines and woodland outlines are mapped context.
+See [research, implementation and validation](corner-city-validation.md) and the subsequent [diagonal placement correction](angled-corner-research.md). The corner bowl and rounded facade have actual openings; the main stand's straight glazing is intact. The city uses an offline OSM extract, shared geographic coordinates and triangle-based terrain sampling. The local landscaped park remains an architectural interpretation; the wider footprints, road centrelines and woodland outlines are mapped context.

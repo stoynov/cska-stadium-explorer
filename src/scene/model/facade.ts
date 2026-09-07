@@ -3,6 +3,7 @@ import { stadiumDimensions } from '../../config/stadium'
 import * as THREE from 'three'
 import {
   cornerEntries,
+  cornerEntryPoint,
   inCornerEntry,
   outsideCornerEntrySpans,
 } from './corner-entry-layout'
@@ -30,7 +31,29 @@ export function addFacade(parent: THREE.Group) {
   const dummy = new THREE.Object3D()
 
   // Individual solid profiles, with real open gaps and separate module joints.
-  const blades = facadeLayout()
+  const blades = facadeLayout().flatMap((blade) => {
+    const spans =
+      blade.y < cornerEntries.exteriorClearHeight + 0.2
+        ? outsideCornerEntrySpans(
+            blade.x,
+            blade.z,
+            -blade.nz,
+            blade.nx,
+            (moduleWidth - 0.035) / 2,
+          )
+        : [
+            {
+              start: -(moduleWidth - 0.035) / 2,
+              end: (moduleWidth - 0.035) / 2,
+            },
+          ]
+    return spans.map((span) => ({
+      ...blade,
+      x: blade.x - (blade.nz * (span.start + span.end)) / 2,
+      z: blade.z + (blade.nx * (span.start + span.end)) / 2,
+      length: span.end - span.start,
+    }))
+  })
   const louvers = new THREE.InstancedMesh(
     new THREE.BoxGeometry(0.38, 0.055, moduleWidth - 0.035),
     champagne,
@@ -40,6 +63,7 @@ export function addFacade(parent: THREE.Group) {
     axis = new THREE.Vector3(0, 0, 1)
   blades.forEach((p, i) => {
     dummy.position.set(p.x, p.y, p.z)
+    dummy.scale.set(1, 1, p.length / (moduleWidth - 0.035))
     dummy.rotation.set(0, -Math.atan2(p.nz, p.nx), 0)
     tilt.setFromAxisAngle(axis, -p.angle)
     dummy.quaternion.multiply(tilt)
@@ -64,7 +88,12 @@ export function addFacade(parent: THREE.Group) {
       envelope.halfLength,
       envelope.cornerRadius,
     )
-    const base = facadeBase(p.x, p.z)
+    const base = Math.max(
+      facadeBase(p.x, p.z),
+      inCornerEntry(p.x - p.nx * 0.3, p.z - p.nz * 0.3, 0.1)
+        ? cornerEntries.exteriorClearHeight
+        : 0,
+    )
     const rail = box(
       facade,
       [0.12, 23.1 - base, 0.07],
@@ -75,20 +104,55 @@ export function addFacade(parent: THREE.Group) {
     rail.rotation.y = -Math.atan2(p.nz, p.nx)
     // Leave the broad entrance glazing visible, including between the upper slats.
     if (!(p.x > 72.5 && Math.abs(p.z) < 64)) {
-      const wall = box(
+      const wallX = p.x - p.nx * 1.3,
+        wallZ = p.z - p.nz * 1.3
+      const wallSpans = outsideCornerEntrySpans(
+        wallX,
+        wallZ,
+        -p.nz,
+        p.nx,
+        (moduleWidth + 0.02) / 2,
+      )
+      const upper = box(
         facade,
-        [0.14, 18.5, moduleWidth + 0.02],
-        [p.x - p.nx * 1.3, 13.85, p.z - p.nz * 1.3],
+        [0.14, 23.1 - cornerEntries.exteriorClearHeight, moduleWidth + 0.02],
+        [wallX, (23.1 + cornerEntries.exteriorClearHeight) / 2, wallZ],
         dark,
         'Recessed charcoal envelope',
       )
-      wall.rotation.y = -Math.atan2(p.nz, p.nx)
+      upper.rotation.y = -Math.atan2(p.nz, p.nx)
+      for (const span of wallSpans) {
+        const mid = (span.start + span.end) / 2
+        const wall = box(
+          facade,
+          [
+            0.14,
+            cornerEntries.exteriorClearHeight - 4.6,
+            span.end - span.start,
+          ],
+          [
+            wallX - p.nz * mid,
+            (cornerEntries.exteriorClearHeight + 4.6) / 2,
+            wallZ + p.nx * mid,
+          ],
+          dark,
+          'Recessed charcoal envelope',
+        )
+        wall.rotation.y = -Math.atan2(p.nz, p.nx)
+      }
     }
     if (bay % 3 === 0 && !(p.x > 72.5 && Math.abs(p.z) < 64)) {
+      const columnBottom = inCornerEntry(
+        p.x - p.nx * 1.5,
+        p.z - p.nz * 1.5,
+        0.2,
+      )
+        ? cornerEntries.exteriorClearHeight
+        : 0.2
       const column = box(
         facade,
-        [0.25, 22.6, 0.25],
-        [p.x - p.nx * 1.5, 11.5, p.z - p.nz * 1.5],
+        [0.25, 22.8 - columnBottom, 0.25],
+        [p.x - p.nx * 1.5, (22.8 + columnBottom) / 2, p.z - p.nz * 1.5],
         structure,
         'Recessed structural column',
       )
@@ -115,69 +179,56 @@ export function addFacade(parent: THREE.Group) {
   for (let col = 0; col < 40; col++) {
     const z = -62 + (col + 0.5) * 3.1
     for (let row = 0; row < 9; row++) {
-      const bottom = 1.25 + row * 2.4 - 2.35 / 2
-      const top = bottom + 2.35
-      const spans =
-        bottom < cornerEntries.exteriorClearHeight
-          ? outsideCornerEntrySpans(z - 1.52, z + 1.52)
-          : [{ start: z - 1.52, end: z + 1.52 }]
-      for (const span of spans) {
-        const pane = box(
-          facade,
-          [0.12, 2.35, span.end - span.start],
-          [71.95, (bottom + top) / 2, (span.start + span.end) / 2],
-          glassTints[(col * 7 + row * 2) % 3],
-          'Blue-grey entrance glazing',
-        )
-        pane.castShadow = false
-      }
+      const pane = box(
+        facade,
+        [0.12, 2.35, 3.04],
+        [71.95, 1.25 + row * 2.4, z],
+        glassTints[(col * 7 + row * 2) % 3],
+        'Blue-grey entrance glazing',
+      )
+      pane.castShadow = false
     }
-    const mullionBottom = inCornerEntry(72.05, z - 1.55, 0.033)
-      ? cornerEntries.exteriorClearHeight
-      : 0.1
     box(
       facade,
-      [0.2, 21.7 - mullionBottom, 0.065],
-      [72.05, (21.7 + mullionBottom) / 2, z - 1.55],
+      [0.2, 21.6, 0.065],
+      [72.05, 10.9, z - 1.55],
       mullion,
       'Curtain wall mullion',
     )
   }
-  for (let row = 0; row <= 9; row++) {
-    const y = 0.05 + row * 2.4
-    const spans =
-      y < cornerEntries.exteriorClearHeight
-        ? outsideCornerEntrySpans(-62, 62)
-        : [{ start: -62, end: 62 }]
-    for (const span of spans)
-      box(
-        facade,
-        [0.2, 0.065, span.end - span.start],
-        [72.05, y, (span.start + span.end) / 2],
-        mullion,
-        'Curtain wall transom',
-      )
-  }
-  for (const sign of [-1, 1]) {
-    for (const z of [cornerEntries.innerZ - 0.12, cornerEntries.outerZ + 0.12])
-      box(
-        facade,
-        [0.32, cornerEntries.exteriorClearHeight, 0.24],
-        [72.05, cornerEntries.exteriorClearHeight / 2, sign * z],
-        structure,
-        'Service opening jamb',
-      )
+  for (let row = 0; row <= 9; row++)
     box(
       facade,
-      [0.4, 0.25, cornerEntries.outerZ - cornerEntries.innerZ + 0.48],
-      [
-        72.05,
-        cornerEntries.exteriorClearHeight + 0.125,
-        (sign * (cornerEntries.innerZ + cornerEntries.outerZ)) / 2,
-      ],
-      structure,
-      'Service opening lintel',
+      [0.2, 0.065, 124],
+      [72.05, 0.05 + row * 2.4, 0],
+      mullion,
+      'Curtain wall transom',
     )
+  for (const sign of [-1, 1]) {
+    for (const offset of [
+      -cornerEntries.halfWidth - 0.2,
+      cornerEntries.halfWidth + 0.2,
+    ]) {
+      const p = cornerEntryPoint(sign, 51.6, offset)
+      const jamb = box(
+        facade,
+        [0.5, cornerEntries.exteriorClearHeight, 0.35],
+        [p.x, cornerEntries.exteriorClearHeight / 2, p.z],
+        structure,
+        'Diagonal corner service opening jamb',
+      )
+      jamb.rotation.y = (-sign * Math.PI) / 4
+    }
+    const p = cornerEntryPoint(sign, 51.6, 0)
+    // Reach the recessed columns as well as the outer curved facade plane.
+    const lintel = box(
+      facade,
+      [3.2, 0.3, 2 * cornerEntries.halfWidth + 0.75],
+      [p.x, cornerEntries.exteriorClearHeight + 0.15, p.z],
+      structure,
+      'Diagonal corner service opening lintel',
+    )
+    lintel.rotation.y = (-sign * Math.PI) / 4
   }
   for (const z of [-37.2, -12.4, 12.4, 37.2]) {
     for (const offset of [-0.7, 0.7]) {

@@ -5,91 +5,79 @@ import { disposeGroup } from './geometry'
 import { mergeStatic } from './stadium'
 import { addFacade } from './facade'
 
-test('facade service openings remain clear below the gallery while adjacent glazing is retained', () => {
-  // Image decoding is unavailable in Bun; only crest texture loading is stubbed.
-  // Every facade pane, mullion, transom and louver remains real geometry.
+const diagonal = Math.SQRT1_2
+function point(sign: number, radius: number, transverse: number, y: number) {
+  return new THREE.Vector3(
+    28.5 + (radius - transverse) * diagonal,
+    y,
+    sign * (47 + (radius + transverse) * diagonal),
+  )
+}
+
+test('both diagonal corner passages are clear through the seating and rounded facade before and after batching', () => {
   const texture = spyOn(THREE.TextureLoader.prototype, 'load').mockReturnValue(
     new THREE.Texture(),
   )
   const root = new THREE.Group()
   try {
+    const seating = addSeating(root)
     const facade = addFacade(root)
     root.updateMatrixWorld(true)
-    for (const sign of [-1, 1]) {
-      for (const z of [47.2, 48, 50.5, 53, 53.8]) {
-        for (const y of [0.6, 1.8, 2.45, 4.85, 6.8]) {
+    const lintels = facade.getObjectsByProperty(
+      'name',
+      'Diagonal corner service opening lintel',
+    )
+    for (const column of facade.getObjectsByProperty(
+      'name',
+      'Recessed structural column',
+    )) {
+      const bounds = new THREE.Box3().setFromObject(column)
+      if (bounds.min.y < 7) continue
+      const support = new THREE.Raycaster(
+        new THREE.Vector3(column.position.x, 7.55, column.position.z),
+        new THREE.Vector3(0, -1, 0),
+        0,
+        0.5,
+      )
+      expect(support.intersectObjects(lintels).length).toBeGreaterThan(0)
+    }
+    const check = () => {
+      root.updateMatrixWorld(true)
+      for (const sign of [-1, 1]) {
+        for (const offset of [-2.8, 0, 2.8]) {
+          for (const y of [0.6, 1.8, 4.85, 6.8]) {
+            const ray = new THREE.Raycaster(
+              point(sign, 8, offset, y),
+              new THREE.Vector3(diagonal, 0, sign * diagonal),
+              0,
+              52,
+            )
+            expect(ray.intersectObject(root, true)).toHaveLength(0)
+          }
+        }
+        // The old straight-wall slots must be gone from the entrance glazing.
+        for (const z of [48, 50.5, 53]) {
           const ray = new THREE.Raycaster(
-            new THREE.Vector3(35, y, sign * z),
+            new THREE.Vector3(70, 2, sign * z),
             new THREE.Vector3(1, 0, 0),
             0,
-            40,
+            4,
           )
-          expect(ray.intersectObject(facade, true)).toHaveLength(0)
+          expect(ray.intersectObject(facade, true).length).toBeGreaterThan(0)
         }
       }
-      for (const [y, z] of [
-        [2, 45],
-        [2, 56],
-        [10, 50.5],
-      ]) {
-        const ray = new THREE.Raycaster(
-          new THREE.Vector3(70, y, sign * z),
-          new THREE.Vector3(1, 0, 0),
-          0,
-          5,
-        )
-        expect(ray.intersectObject(facade, true).length).toBeGreaterThan(0)
-      }
     }
+    check()
+    mergeStatic(seating)
+    mergeStatic(facade)
+    check()
   } finally {
     texture.mockRestore()
     disposeGroup(root)
   }
-})
+}, 20000)
 
-test('both Sector A corner passages are clear from pitch to exterior with an overhead bridge', () => {
-  const root = new THREE.Group()
-  const seating = addSeating(root)
-  root.updateMatrixWorld(true)
-  const checkPassages = () => {
-    for (const sign of [-1, 1]) {
-      for (const z of [48, 50.5, 53]) {
-        for (const y of [0.6, 1.8, 4.5, 8.5]) {
-          const ray = new THREE.Raycaster(
-            new THREE.Vector3(35, y, sign * z),
-            new THREE.Vector3(1, 0, 0),
-            0,
-            40,
-          )
-          expect(ray.intersectObject(seating, true)).toHaveLength(0)
-        }
-      }
-      const bridge = new THREE.Raycaster(
-        new THREE.Vector3(53.2, 9, sign * 50.5),
-        new THREE.Vector3(0, 1, 0),
-        0,
-        2,
-      ).intersectObject(seating, true)
-      expect(bridge.length).toBeGreaterThan(0)
-      expect(bridge[0].point.y).toBeGreaterThan(9.5)
-      // Walk from the Silver terrace onto the bridge without a solid end return.
-      const terraceExit = new THREE.Raycaster(
-        new THREE.Vector3(53.2, 11.3, sign * 46),
-        new THREE.Vector3(0, 0, sign),
-        0,
-        6,
-      )
-      expect(terraceExit.intersectObject(seating, true)).toHaveLength(0)
-    }
-  }
-  checkPassages()
-  mergeStatic(seating)
-  root.updateMatrixWorld(true)
-  checkPassages()
-  disposeGroup(root)
-}, 15000)
-
-test('corner cutouts remove concrete and chair footprints while retaining supported adjacent stands', () => {
+test('diagonal openings cut chair footprints and terraces while restoring the lower corner beside Sector A', () => {
   const root = new THREE.Group()
   const seating = addSeating(root)
   root.updateMatrixWorld(true)
@@ -103,57 +91,121 @@ test('corner cutouts remove concrete and chair footprints while retaining suppor
   for (let i = 0; i < chairs.count; i++) {
     chairs.getMatrixAt(i, matrix)
     const p = new THREE.Vector3().setFromMatrixPosition(matrix)
-    if (p.x > 34 && Math.abs(p.z) > 47) {
-      expect(Math.abs(p.z) - 0.32).toBeGreaterThanOrEqual(54)
-    }
+    if (p.x <= 28.5 || Math.abs(p.z) <= 47) continue
+    const transverse = (Math.abs(p.z) - 47 - (p.x - 28.5)) * diagonal
+    expect(Math.abs(transverse)).toBeGreaterThan(3.82)
+    if (transverse < -3.5) expect(p.y).toBeLessThan(10.2)
   }
   for (const sign of [-1, 1]) {
-    for (const x of [40, 48, 58]) {
-      const voidRay = new THREE.Raycaster(
-        new THREE.Vector3(x, 30, sign * 50.5),
+    for (const radius of [12, 20, 30]) {
+      const ray = new THREE.Raycaster(
+        point(sign, radius, 0, 30),
         new THREE.Vector3(0, -1, 0),
       )
-      expect(voidRay.intersectObject(terraces)).toHaveLength(0)
+      expect(ray.intersectObject(terraces)).toHaveLength(0)
     }
     for (const [x, z] of [
-      [44, 56],
-      [54, 56],
-      [42, 44],
+      [44, 50.5],
+      [44, 68],
       [-44, 50.5],
     ]) {
-      const retained = new THREE.Raycaster(
+      const ray = new THREE.Raycaster(
         new THREE.Vector3(x, 30, sign * z),
         new THREE.Vector3(0, -1, 0),
       )
-      expect(retained.intersectObject(terraces).length).toBeGreaterThan(0)
+      expect(ray.intersectObject(terraces).length).toBeGreaterThan(0)
     }
-    // The bridge has actual side supports outside the vehicle/pedestrian opening.
-    for (const z of [46.8, 54.2]) {
+  }
+  disposeGroup(root)
+})
+
+test('curved Silver galleries support the diagonal bridges and remain connected to the VIP terrace', () => {
+  const root = new THREE.Group()
+  const seating = addSeating(root)
+  root.updateMatrixWorld(true)
+  for (const sign of [-1, 1]) {
+    for (const [x, z] of [
+      [53.2, 47.2],
+      [51.9, 56.7],
+    ]) {
+      const ray = new THREE.Raycaster(
+        new THREE.Vector3(x, 11, sign * z),
+        new THREE.Vector3(0, -1, 0),
+        0,
+        1,
+      )
+      const hit = ray.intersectObject(seating, true)[0]
+      expect(hit).toBeDefined()
+      expect(hit.point.y).toBeCloseTo(10.16, 2)
+    }
+    const bridge = new THREE.Raycaster(
+      point(sign, 25, 0, 9),
+      new THREE.Vector3(0, 1, 0),
+      0,
+      2,
+    ).intersectObject(seating, true)
+    expect(bridge.length).toBeGreaterThan(0)
+    expect(bridge[0].point.y).toBeGreaterThan(9.5)
+    const exit = new THREE.Raycaster(
+      new THREE.Vector3(53.2, 11.3, sign * 46),
+      new THREE.Vector3(0, 0, sign),
+      0,
+      4,
+    )
+    expect(exit.intersectObject(seating, true)).toHaveLength(0)
+    for (const offset of [-3.8, 3.8]) {
       const support = new THREE.Raycaster(
-        new THREE.Vector3(61, 9, sign * z),
+        point(sign, 26, offset, 9),
         new THREE.Vector3(0, -1, 0),
         0,
         9,
       )
       expect(support.intersectObject(seating, true).length).toBeGreaterThan(0)
+      const bearing = new THREE.Raycaster(
+        point(sign, 26, offset, 9.8),
+        new THREE.Vector3(0, 1, 0),
+        0,
+        0.5,
+      )
+      expect(bearing.intersectObject(seating, true).length).toBeGreaterThan(0)
     }
-    // The raised gallery reaches the public concourse by a supported return
-    // stair, instead of ending against the higher corner tier's cheek wall.
-    for (const [x, minimumY, maximumY] of [
-      [55, 11.8, 12.8],
-      [60, 15.2, 16.2],
-      [63.7, 18, 18.4],
-    ]) {
-      const support = new THREE.Raycaster(
-        new THREE.Vector3(x, 19, sign * 53),
+  }
+  disposeGroup(root)
+})
+
+test('the public row16 landing has a supported chair-free route from each bridge to its corner stair', () => {
+  const root = new THREE.Group()
+  const seating = addSeating(root)
+  root.updateMatrixWorld(true)
+  const radius = 23.52
+  for (const sign of [-1, 1]) {
+    const at = (angle: number, y: number) =>
+      new THREE.Vector3(
+        28.5 + radius * Math.cos(angle),
+        y,
+        sign * (47 + radius * Math.sin(angle)),
+      )
+    for (let degrees = 54; degrees < 76; degrees += 2) {
+      const a = (degrees * Math.PI) / 180,
+        b = ((degrees + 2) * Math.PI) / 180
+      for (const height of [10.5, 10.8]) {
+        const start = at(a, height),
+          finish = at(b, height)
+        const ray = new THREE.Raycaster(
+          start,
+          finish.clone().sub(start).normalize(),
+          0,
+          start.distanceTo(finish),
+        )
+        expect(ray.intersectObject(seating, true)).toHaveLength(0)
+      }
+      const floor = new THREE.Raycaster(
+        at(a, 10.35),
         new THREE.Vector3(0, -1, 0),
         0,
-        9,
+        0.4,
       )
-      const hit = support.intersectObject(seating, true)[0]
-      expect(hit).toBeDefined()
-      expect(hit.point.y).toBeGreaterThan(minimumY)
-      expect(hit.point.y).toBeLessThan(maximumY)
+      expect(floor.intersectObject(seating, true).length).toBeGreaterThan(0)
     }
   }
   disposeGroup(root)

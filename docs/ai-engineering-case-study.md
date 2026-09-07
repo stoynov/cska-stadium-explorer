@@ -24,6 +24,8 @@ The goal nets are a useful example. The original model looked plausible from a d
 
 Sector A exposed a different failure: the model repeated a generic seating profile where the reference showed lower seating and stacked hospitality spaces. The correction first removes incompatible rows and stairs, then builds the lounges and terraces. A later, clearer photograph revealed large corner passages that the earlier reconstruction still lacked. That feedback became a separate geometry task; a previous green test suite was evidence only for the properties it actually checked.
 
+A further comparison caught a more specific error: those passages were clear but faced through the straight wall instead of the curved corners. The [diagonal correction](angled-corner-research.md) added placement checks as well as clearance checks. A reusable local research skill now archives primary-source pages and images with provenance and records which evidence has actually been inspected.
+
 The city review caught a less visible problem: bilinear elevation sampling disagreed with the rendered terrain triangles, burying parts of the roads. The fix uses the mesh's actual triangle interpolation. The [corner and city validation record](corner-city-validation.md) documents this finding, the bounded map dataset, and the subsequent geometry and browser checks.
 
 This is the main learning outcome: useful AI assistance needs explicit constraints, independent review and tests that can reject an attractive but incorrect result. More agents or a longer prompt do not establish correctness by themselves.

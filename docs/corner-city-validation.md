@@ -2,6 +2,8 @@
 
 Research and validation: 7 September 2026. This follows the [goals and hospitality revision](goals-sector-a-research.md).
 
+Historical record for build-6: its straight passage placement was subsequently corrected to follow the diagonal corners. See the [placement correction and new validation](angled-corner-research.md); the city findings below remain applicable.
+
 ## Reference interpretation
 
 The user supplied a clearer, nearly frontal photograph of Sector A. It shows a large open passage at either end of the lower stand, below connecting galleries beside the hospitality block. The screenshot was supplied on 7 September; the underlying photograph's capture date is unknown. The [official August photograph](https://stadium.cska.bg/wp-content/uploads/2026/08/DJI_20260809161028_0097_D-2048x1152.jpg) and [club hospitality description](https://stadium.cska.bg/в-сърцето-на-българска-армия-секто-2/) provide complementary context.

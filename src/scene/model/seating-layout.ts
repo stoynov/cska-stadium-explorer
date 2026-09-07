@@ -35,7 +35,7 @@ export const aisleAxes: AisleAxis[] = [
   // including the width of their pitch-side approach flights.
   ...[1, 3, 5, 7].map((side) => ({
     side,
-    station: ((side === 1 ? 65 : side === 7 ? 25 : 45) * Math.PI) / 180,
+    station: ((side === 1 ? 80 : side === 7 ? 10 : 45) * Math.PI) / 180,
   })),
 ]
 

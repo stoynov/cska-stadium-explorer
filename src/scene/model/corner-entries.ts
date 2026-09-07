@@ -1,187 +1,214 @@
 import * as THREE from 'three'
 import { box, beam, standard } from './geometry'
-import { cornerEntries as e } from './corner-entry-layout'
+import {
+  cornerEntries as e,
+  cornerEntryPoint,
+  clipEntryEdge,
+} from './corner-entry-layout'
 import { hospitalityLayout as h } from './hospitality-layout'
 import { stadiumDimensions } from '../../config/stadium'
 import { rowSurfaceHeight, sectorALowerRows } from './seating-layout'
 
 export function addCornerEntries(parent: THREE.Group) {
   const group = new THREE.Group()
-  group.name = 'Sector A — two open corner service passages'
+  group.name = 'Sector A — two diagonal corner service passages'
   group.userData.interpretation =
-    'Photo-derived open stand seams, supported gallery links and pitch-level service access; approximate dimensions'
+    'Approximate diagonal corner passages, curved Silver galleries and transverse bridges derived from the supplied main-stand photograph'
   parent.add(group)
   const concrete = standard('#bbbdb7', 0.88),
     pale = standard('#d6d8d0', 0.78),
     rail = standard('#727b7d', 0.43, 0.55),
     pavement = standard('#91968f', 0.97)
   const bowl = stadiumDimensions.seating
+  const innerRadius = h.frontX - e.centreX,
+    outerRadius = h.backX - e.centreX
   for (const sign of [-1, 1]) {
     const passage = new THREE.Group()
-    passage.name = `Sector A ${sign < 0 ? '−Z' : '+Z'} corner passage`
+    passage.name = `Sector A ${sign < 0 ? '−Z' : '+Z'} diagonal corner passage`
     group.add(passage)
-    box(
-      passage,
-      [e.exteriorX - e.pitchX, 0.08, e.outerZ - e.innerZ],
-      [
-        (e.exteriorX + e.pitchX) / 2,
-        e.floor - 0.04,
-        (sign * (e.innerZ + e.outerZ)) / 2,
-      ],
+    const localBox = (
+      length: number,
+      height: number,
+      width: number,
+      radius: number,
+      y: number,
+      transverse: number,
+      material: THREE.Material,
+      name: string,
+    ) => {
+      const p = cornerEntryPoint(sign, radius, transverse)
+      const mesh = box(
+        passage,
+        [length, height, width],
+        [p.x, y, p.z],
+        material,
+        name,
+      )
+      mesh.rotation.y = (-sign * Math.PI) / 4
+      return mesh
+    }
+    localBox(
+      e.exteriorRadius - e.pitchRadius,
+      0.08,
+      2 * e.halfWidth,
+      (e.exteriorRadius + e.pitchRadius) / 2,
+      e.floor - 0.04,
+      0,
       pavement,
-      'Continuous open service passage pavement',
+      'Diagonal open service passage pavement',
     )
-    box(
-      passage,
-      [h.backX - h.frontX, e.bridgeThickness, e.outerZ - e.innerZ + 0.4],
-      [
-        (h.backX + h.frontX) / 2,
-        e.bridgeTop - e.bridgeThickness / 2,
-        (sign * (e.innerZ + e.outerZ)) / 2,
-      ],
-      concrete,
-      'Corner connecting gallery slab',
+
+    // The Silver gallery follows the lower corner around from Sector A and
+    // crosses the passage tangentially at the same elevation as public row16.
+    const galleryEdge = e.halfWidth + 0.4
+    const positions: number[] = []
+    const surface = (polygon: number[][]) => {
+      const clipped = clipEntryEdge(polygon, sign, galleryEdge, true)
+      for (let i = 1; i < clipped.length - 1; i++)
+        positions.push(...clipped[0], ...clipped[i], ...clipped[i + 1])
+    }
+    const arc = (
+      radius: number,
+      angle: number,
+      y: number,
+    ): [number, number, number] => [
+      e.centreX + radius * Math.cos(angle),
+      y,
+      sign * (e.centreZ + radius * Math.sin(angle)),
+    ]
+    const bottom = e.bridgeTop - e.bridgeThickness
+    for (let i = 0; i < 80; i++) {
+      const a = (i * Math.PI) / 160,
+        b = ((i + 1) * Math.PI) / 160
+      for (const y of [bottom, e.bridgeTop])
+        surface([
+          arc(innerRadius, a, y),
+          arc(outerRadius, a, y),
+          arc(outerRadius, b, y),
+          arc(innerRadius, b, y),
+        ])
+      for (const r of [innerRadius, outerRadius])
+        surface([
+          arc(r, a, bottom),
+          arc(r, b, bottom),
+          arc(r, b, e.bridgeTop),
+          arc(r, a, e.bridgeTop),
+        ])
+    }
+    const innerRun = Math.sqrt(innerRadius ** 2 - galleryEdge ** 2),
+      outerRun = Math.sqrt(outerRadius ** 2 - galleryEdge ** 2)
+    const edgeA = cornerEntryPoint(sign, innerRun, galleryEdge),
+      edgeB = cornerEntryPoint(sign, outerRun, galleryEdge)
+    surface([
+      [edgeA.x, bottom, edgeA.z],
+      [edgeB.x, bottom, edgeB.z],
+      [edgeB.x, e.bridgeTop, edgeB.z],
+      [edgeA.x, e.bridgeTop, edgeA.z],
+    ])
+    const geometry = new THREE.BufferGeometry()
+    geometry.setAttribute(
+      'position',
+      new THREE.Float32BufferAttribute(positions, 3),
     )
-    for (const z of [e.innerZ - 0.25, e.outerZ + 0.25]) {
-      for (const x of [h.frontX + 0.45, 61, h.backX - 0.45]) {
-        box(
-          passage,
-          [0.5, e.bridgeTop - e.bridgeThickness - e.floor, 0.5],
-          [x, (e.floor + e.bridgeTop - e.bridgeThickness) / 2, sign * z],
+    geometry.computeVertexNormals()
+    const gallery = new THREE.Mesh(geometry, concrete)
+    gallery.name = 'Curved Silver gallery and transverse corner bridge'
+    gallery.castShadow = gallery.receiveShadow = true
+    passage.add(gallery)
+
+    // Support columns sit outside the diagonal clear width on both sides.
+    for (const offset of [-e.halfWidth - 0.3, e.halfWidth + 0.3]) {
+      for (const radius of [24, 26, 33, 40])
+        localBox(
+          0.5,
+          bottom - e.floor,
+          0.5,
+          radius,
+          (bottom + e.floor) / 2,
+          offset,
           concrete,
-          'Gallery support outside clear passage',
+          'Gallery support outside diagonal passage',
         )
-      }
-      box(
-        passage,
-        [h.backX - h.frontX, 0.4, 0.5],
-        [
-          (h.backX + h.frontX) / 2,
-          e.bridgeTop - e.bridgeThickness - 0.2,
-          sign * z,
-        ],
+      localBox(
+        17,
+        0.35,
+        0.5,
+        32,
+        bottom - 0.175,
+        offset,
         concrete,
-        'Gallery bearing beam',
+        'Diagonal gallery bearing beam',
       )
     }
-    // Guards follow the exposed longitudinal edges; neither end crosses the walk.
-    for (const x of [h.frontX + 0.08, h.backX - 0.08]) {
-      box(
-        passage,
-        [0.065, 0.065, e.outerZ - e.innerZ],
-        [x, e.bridgeTop + 1.05, (sign * (e.innerZ + e.outerZ)) / 2],
-        rail,
-        'Gallery guard top rail',
-      )
-      for (let z = e.innerZ + 0.15; z < e.outerZ; z += 1.35)
-        box(
-          passage,
-          [0.045, 1.05, 0.045],
-          [x, e.bridgeTop + 0.525, sign * z],
-          rail,
-          'Gallery guard upright',
-        )
-      box(
-        passage,
-        [0.15, 0.28, e.outerZ - e.innerZ],
-        [x, e.bridgeTop - 0.08, (sign * (e.innerZ + e.outerZ)) / 2],
-        pale,
-        'Pale gallery fascia',
-      )
-    }
-    // A narrow return flight joins the lower VIP gallery to the retained
-    // public concourse. Its arrangement is interpretive, not a measured plan.
-    const stairStart = 51.8,
-      stairEnd = 63.7,
-      stairTop = 18.2,
-      steps = 45
-    const run = (stairEnd - stairStart) / steps
-    const rise = (stairTop - e.bridgeTop) / steps
-    for (let step = 0; step < steps; step++) {
-      const top = e.bridgeTop + (step + 1) * rise
-      box(
-        passage,
-        [run + 0.008, 0.28, 1.4],
-        [stairStart + (step + 0.5) * run, top - 0.14, sign * 53],
-        concrete,
-        'Corner gallery return stair tread',
-      )
-    }
-    box(
-      passage,
-      [0.8, 0.24, 1.4],
-      [stairEnd + 0.35, stairTop - 0.12, sign * 53],
-      concrete,
-      'Corner gallery upper concourse landing',
-    )
-    for (const z of [52.26, 53.74]) {
-      beam(
-        passage,
-        new THREE.Vector3(stairStart, e.bridgeTop - 0.2, sign * z),
-        new THREE.Vector3(stairEnd, stairTop - 0.2, sign * z),
-        0.14,
-        concrete,
-      )
-      beam(
-        passage,
-        new THREE.Vector3(stairStart, e.bridgeTop + 1.04, sign * z),
-        new THREE.Vector3(stairEnd, stairTop + 1.04, sign * z),
-        0.027,
-        rail,
-      )
-      for (let step = 0; step <= steps; step += 5) {
-        const x = stairStart + step * run,
-          y = e.bridgeTop + step * rise
+    // Curved front/back rails stop at the bridge's public-side landing.
+    for (const radius of [innerRadius + 0.08, outerRadius - 0.08]) {
+      const end = Math.PI / 4 + Math.asin(galleryEdge / radius)
+      const segments = Math.ceil((radius * end) / 1.3)
+      for (let i = 0; i < segments; i++) {
+        const a = (i * end) / segments,
+          b = ((i + 1) * end) / segments
+        const p = arc(radius, a, e.bridgeTop + 1.05),
+          q = arc(radius, b, e.bridgeTop + 1.05)
         beam(
           passage,
-          new THREE.Vector3(x, y, sign * z),
-          new THREE.Vector3(x, y + 1.04, sign * z),
+          new THREE.Vector3(...p),
+          new THREE.Vector3(...q),
+          0.027,
+          rail,
+        )
+        beam(
+          passage,
+          new THREE.Vector3(p[0], e.bridgeTop, p[2]),
+          new THREE.Vector3(...p),
           0.022,
           rail,
         )
       }
-      box(
-        passage,
-        [0.25, stairTop - e.bridgeTop - 0.3, 0.25],
-        [stairEnd - 0.1, (stairTop + e.bridgeTop - 0.3) / 2, sign * z],
-        concrete,
-        'Return stair bearing above gallery',
-      )
     }
-    // Close the cut structural sections along the sides, never across the opening.
-    for (const corner of [false, true]) {
-      const rows = corner ? bowl.rows : sectorALowerRows
-      const cutX = (depth: number) =>
-        corner
-          ? bowl.halfWidth -
-            bowl.cornerRadius +
-            Math.sqrt(
-              (bowl.cornerRadius + depth) ** 2 - (e.outerZ - e.innerZ) ** 2,
-            )
-          : bowl.halfWidth + depth
+    // Stepped cheeks close only the exposed cross-sections of the two tiers.
+    for (const mainSide of [true, false]) {
+      const offset = (mainSide ? -1 : 1) * (e.halfWidth + 0.09)
+      const rows = mainSide ? sectorALowerRows : bowl.rows
       for (let row = 0; row < rows; row++) {
-        const x0 = cutX(row * bowl.rowDepth),
-          x1 = cutX((row + 1) * bowl.rowDepth)
+        const r0 = bowl.cornerRadius + row * bowl.rowDepth,
+          r1 = r0 + bowl.rowDepth
+        const start = Math.sqrt(r0 ** 2 - e.halfWidth ** 2),
+          end = Math.sqrt(r1 ** 2 - e.halfWidth ** 2)
         const y = rowSurfaceHeight(row)
-        const z = sign * (corner ? e.outerZ + 0.09 : e.innerZ - 0.09)
-        box(
-          passage,
-          [x1 - x0 + 0.006, y - e.floor, 0.18],
-          [(x0 + x1) / 2, (y + e.floor) / 2, z],
+        localBox(
+          end - start + 0.008,
+          y - e.floor,
+          0.18,
+          (start + end) / 2,
+          (y + e.floor) / 2,
+          offset,
           concrete,
-          'Stepped retaining cheek at stand cut',
+          'Stepped diagonal retaining cheek',
         )
-        const outsideBridge = x1 < h.frontX || x0 > h.backX
-        if (outsideBridge || corner)
+        const a = cornerEntryPoint(sign, start, offset),
+          b = cornerEntryPoint(sign, end, offset)
+        // Leave the row16 gallery landing clear instead of railing it shut.
+        if (row !== sectorALowerRows)
           beam(
             passage,
-            new THREE.Vector3(x0, y + 1.04, z),
-            new THREE.Vector3(x1, y + 1.04 + bowl.rowRise, z),
+            new THREE.Vector3(a.x, y + 1.04, a.z),
+            new THREE.Vector3(b.x, y + 1.04 + bowl.rowRise, b.z),
             0.026,
             rail,
           )
       }
     }
+    // Low edge fascia makes the bridge read as one continuous concrete slab.
+    localBox(
+      outerRun - innerRun,
+      0.25,
+      0.12,
+      (outerRun + innerRun) / 2,
+      e.bridgeTop - 0.12,
+      galleryEdge - 0.06,
+      pale,
+      'Diagonal bridge slab edge',
+    )
   }
   return group
 }

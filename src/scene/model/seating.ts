@@ -1,7 +1,11 @@
 import { whiteSeat } from './seat-lettering'
 import { addHospitality } from './hospitality'
 import { addCornerEntries } from './corner-entries'
-import { clipCornerEntry, inCornerEntry } from './corner-entry-layout'
+import {
+  clipCornerEntry,
+  inCornerEntry,
+  cornerEntryOffset,
+} from './corner-entry-layout'
 import { stadiumDimensions } from '../../config/stadium'
 import * as THREE from 'three'
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js'
@@ -16,6 +20,7 @@ import {
   rowSurfaceHeight,
   stairTreads,
   seatingRows,
+  sectorALowerRows,
 } from './seating-layout'
 
 export function addSeating(parent: THREE.Group) {
@@ -34,21 +39,16 @@ export function addSeating(parent: THREE.Group) {
     rng = seededRandom(48)
   const tops: number[] = [],
     risers: number[] = []
-  const quad = (
-    out: number[],
-    a: number[],
-    b: number[],
-    c: number[],
-    d: number[],
-  ) => out.push(...a, ...b, ...c, ...a, ...c, ...d)
   const clippedQuad = (
     out: number[],
     side: number,
+    row: number,
     ...vertices: number[][]
   ) => {
-    const polygon = clipCornerEntry(side, vertices)
-    for (let i = 1; i < polygon.length - 1; i++)
-      out.push(...polygon[0], ...polygon[i], ...polygon[i + 1])
+    const polygons = clipCornerEntry(side, vertices, row < sectorALowerRows)
+    for (const polygon of polygons)
+      for (let i = 1; i < polygon.length - 1; i++)
+        out.push(...polygon[0], ...polygon[i], ...polygon[i + 1])
   }
   const seats: {
     x: number
@@ -82,6 +82,7 @@ export function addSeating(parent: THREE.Group) {
         clippedQuad(
           tops,
           side,
+          row,
           [a.x, y, a.z],
           [b.x, y, b.z],
           [c.x, y, c.z],
@@ -90,6 +91,7 @@ export function addSeating(parent: THREE.Group) {
         clippedQuad(
           risers,
           side,
+          row,
           [d.x, y, d.z],
           [c.x, y, c.z],
           [c.x, y + bowl.rowRise, c.z],
@@ -98,14 +100,22 @@ export function addSeating(parent: THREE.Group) {
       }
       const count = Math.floor(length / (side === 0 ? 0.62 : 0.53))
       for (let c = 0; c < count; c++) {
-        const p = bowlPoint(
-          side,
-          sideStation(side, (c + 0.5) / count),
-          depth + 0.42,
-        )
+        const station = sideStation(side, (c + 0.5) / count)
+        const p = bowlPoint(side, station, depth + 0.42)
         if (circulationAt(p, depth + 0.42, circulation.seatMargin)) continue
-        if ((side === 1 || side === 7) && inCornerEntry(p.x, p.z, 0.36))
+        if (
+          (side === 1 || side === 7) &&
+          (inCornerEntry(p.x, p.z, 0.36) ||
+            (row >= sectorALowerRows && cornerEntryOffset(p.x, p.z) < 0))
+        )
           continue
+        // The bridge meets row16 directly. Keep that existing tread clear
+        // around the public corner until it reaches the ordinary stair.
+        if (row === sectorALowerRows && (side === 1 || side === 7)) {
+          const stair = aisleAxes.find((axis) => axis.side === side)!
+          if (side === 1 ? station <= stair.station : station >= stair.station)
+            continue
+        }
         const white = whiteSeat(side, p.z, row)
         const premium = side === 0 && Math.abs(p.z) < 20
         const color = new THREE.Color(
@@ -337,8 +347,10 @@ export function addSeating(parent: THREE.Group) {
         b = bowlPoint(side, s1, 24.5)
       const c = bowlPoint(side, s1, 26),
         d = bowlPoint(side, s0, 26)
-      quad(
+      clippedQuad(
         concourse,
+        side,
+        sectorALowerRows,
         [a.x, 18.2, a.z],
         [b.x, 18.2, b.z],
         [c.x, 18.2, c.z],
